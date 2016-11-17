@@ -57,7 +57,10 @@ private slots:
 
 	void on_actionDebug_triggered();
 
+
+	void startConnection();
 private:
+
 
 	void sendReciveTcp(QString &msg);
 	QString my_ip;

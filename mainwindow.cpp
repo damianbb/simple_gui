@@ -247,8 +247,20 @@ void MainWindow::showMsg(const nlohmann::json &msg)
 
 void MainWindow::startConnection()
 {
+	m_socket = new QTcpSocket(this);
 
+	m_socket->connectToHost("localhost", 8899);
+
+	connect(m_socket, SIGNAL(readyRead()),this, SLOT(onReciveTcp()));
+
+		// we need to wait...
+		if(!m_socket->waitForConnected(5000))
+		{
+			qDebug() << "Error: " << m_socket->errorString();
+		}
 }
+
+
 void MainWindow::on_actionDebug_triggered()
 {
 	qDebug()<< "show dlg";
@@ -256,3 +268,5 @@ void MainWindow::on_actionDebug_triggered()
 		dialog.exec();
 		dialog.show();
 }
+
+
