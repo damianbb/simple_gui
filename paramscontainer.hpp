@@ -5,6 +5,8 @@
 #include <QStringList>
 #include <QMap>
 
+#include "mainwindow.hpp"
+
 class ParamsContainer : public QObject
 {
 	Q_OBJECT
@@ -17,14 +19,14 @@ public slots:
 	bool readParams(QString file_name);
 	bool writeParams(QString file_name);
 	QString getIp();
-	QMap<QString,QString> getPeerList();
+	std::vector<peer_reference> getPeerList();
 
 	void setIp(QString my_ip);
-	void setPeerList(QMap<QString,QString> peer_list);
+	void setPeerList(std::vector<peer_reference> &peer_list);
 private:
 	bool m_was_readed;
 
-	QMap<QString,QString>m_peers;
+	std::vector<peer_reference> m_peers;
 	QString m_my_ip;
 
 };

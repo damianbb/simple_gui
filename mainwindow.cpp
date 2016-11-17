@@ -2,6 +2,7 @@
 #include <QProcess>
 #include <QTcpSocket>
 
+#include <regex>
 
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
@@ -9,6 +10,8 @@
 #include "paramscontainer.hpp"
 #include "dataeater.hpp"
 #include "debugdialog.hpp"
+
+#include <boost/asio.hpp>
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),m_parser(*this),
@@ -23,12 +26,12 @@ MainWindow::MainWindow(QWidget *parent) :
 	*/
 	ParamsContainer params;
 	params.readParams("peers.json");
-	m_peer_lst =params.getPeerList();
+	m_peer_lst = params.getPeerList();
 
 
 
-	for(auto it : m_peer_lst.keys()){
-		QString peer_val =it + "-" + m_peer_lst[it];
+	for(auto it : m_peer_lst){
+		QString peer_val = QString::fromStdString(it.m_ipv6);
 		ui->peerListWidget->addItem(peer_val);
 	}
 
@@ -41,6 +44,9 @@ MainWindow::MainWindow(QWidget *parent) :
 	for (auto it :tst_msg) {
 		testData.push_back(it);
 	}
+
+
+
 /*
 	dataeater eater;
 	eater.eat(testData);
@@ -65,8 +71,8 @@ void MainWindow::on_connectButton_clicked()
 {
 	QStringList l_peer_list;
 
-	for (auto it :m_peer_lst.keys()) {
-		QString label = it+":9042-"+m_peer_lst[it];
+	for (auto it :m_peer_lst) {
+		QString label = QString::fromStdString(it.m_ipv4+":"+std::to_string(it.m_port)+"-"+it.m_ipv6);
 		l_peer_list.push_back(label);
 	}
 	/*
@@ -95,24 +101,61 @@ void MainWindow::onNewConnection()
 	*/
 }
 
+peer_reference peer_reference::get_validated_ref(std::string ref) {
+	std::string r_ipv4_port;
+	std::string r_ipv4;
+	std::string r_port;
+	std::string r_ipv6;
+
+	size_t pos1;
+	if ((pos1 = ref.find('-')) != std::string::npos) {
+		r_ipv4_port = ref.substr(0,pos1);
+		r_ipv6 = ref.substr(pos1+1);
+
+		std::regex pattern("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d{1,5}"); // i.e. 127.0.0.1:4562
+		std::smatch result;
+		qDebug()<<r_ipv4_port.c_str();
+		if (std::regex_search(r_ipv4_port, result, pattern)) {
+			size_t pos2 = r_ipv4_port.find(':');
+			r_ipv4 = r_ipv4_port.substr(0, pos2);
+			r_port = r_ipv4_port.substr(pos2+1);
+		} else
+			throw std::invalid_argument("bad format of input remote address and port");
+
+		boost::system::error_code ec;
+		// validate ipv4
+		boost::asio::ip::address_v4::from_string(r_ipv4, ec);
+		if (ec)
+			throw std::invalid_argument("bad format of input remote IPv4 address");
+		// validate ipv6
+		boost::asio::ip::address_v6::from_string(r_ipv6, ec);
+		if(ec)
+			throw std::invalid_argument("bad format of input remote IPv6 address");
+
+	} else
+		throw std::invalid_argument("bad format of input ref - missing '-'");
+	return {r_ipv4 ,stoi(r_port), r_ipv6};
+}
+
 void MainWindow::addAddress(QString address)
 {
-	qDebug()<<address;
-	QStringList added_address = address.split("-");
+	qDebug()<< "add address [" << address << ']';
+	try {
+		peer_reference peer_ref = peer_reference::get_validated_ref(address.toStdString());
+		m_peer_lst.push_back(peer_ref);
+		ui->peerListWidget->addItem(address);
 
-	try{
-		m_peer_lst.insert(added_address.at(0),added_address.at(1));
-	}catch (...)
-	{
-		qDebug()<<"bad address format";
+	} catch (std::exception &er) {
+		qDebug()<< er.what();
+	} catch (...) {
+		qDebug()<< "fail to parse address - bad format";
 	}
 
-	ui->peerListWidget->addItem(address);
 }
 
 void MainWindow::startProgram(QStringList & l_peer_list)
 {
-	QString command = "./tunserver.elf ";
+	QString command = "./../../../galaxy42/tunserver.elf";
 	QStringList params_list;
 	foreach (auto it, l_peer_list) {
 		QString peer_string =" --peer "+it;
@@ -121,8 +164,8 @@ void MainWindow::startProgram(QStringList & l_peer_list)
 
 	qDebug()<<params_list;
 	QProcess *m_tunserver_process = new QProcess(this);
-	connect (m_tunserver_process,SIGNAL(readyReadStandardOutput()),this,SLOT(onProcessInfo()));
-	connect (m_tunserver_process,SIGNAL(readyReadStandardError()),this,SLOT(onProcessError()));
+	//connect (m_tunserver_process,SIGNAL(readyReadStandardOutput()),this,SLOT(onProcessInfo()));
+	//connect (m_tunserver_process,SIGNAL(readyReadStandardError()),this,SLOT(onProcessError()));
 
 	m_tunserver_process->start(command , params_list);
 	sleep(1);
@@ -202,7 +245,10 @@ void MainWindow::showMsg(const nlohmann::json &msg)
 	qDebug()<<text.c_str();
 }
 
+void MainWindow::startConnection()
+{
 
+}
 void MainWindow::on_actionDebug_triggered()
 {
 	qDebug()<< "show dlg";

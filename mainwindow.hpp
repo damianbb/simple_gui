@@ -4,12 +4,20 @@
 #include <QMainWindow>
 #include <QProcess>
 #include <QTcpSocket>
-#include <QMap>
+#include <QVector>
 
 #include "netparser.hpp"
 #include "addressdialog.hpp"
 #include "dataeater.hpp"
 
+
+struct peer_reference {
+	std::string m_ipv4;
+	int m_port;
+	std::string m_ipv6;
+
+	static peer_reference get_validated_ref(std::string ref);
+};
 
 namespace Ui {
 class MainWindow;
@@ -57,7 +65,7 @@ private:
 	QProcess *m_tunserver_process;
 	addressDialog *m_dlg;
 	QTcpSocket *m_socket;
-	QMap<QString,QString> m_peer_lst;
+	std::vector <peer_reference> m_peer_lst;
 	dataeater m_data_eater;
 	netParser m_parser;
 

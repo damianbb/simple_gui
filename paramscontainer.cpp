@@ -23,7 +23,8 @@ bool ParamsContainer::readParams(QString file_name)
 
 	QJsonDocument loadDoc(QJsonDocument::fromJson(data));
 	QJsonObject params_obj = loadDoc.object()["peerList"].toObject();
-	for (auto it:params_obj.keys()) m_peers.insert(it,params_obj[it].toString());
+	//for (const auto &it : params_obj.keys())
+		//m_peers.insert(it,params_obj[it].toString());
 	return true;
 }
 
@@ -34,7 +35,8 @@ bool ParamsContainer::writeParams(QString file_name)
 		return false;
 	}
 	QJsonObject peersLst;
-	for (auto it: m_peers.keys()) peersLst[it] = m_peers[it];
+	//for (auto it : m_peers.keys())
+	//	peersLst[it] = m_peers[it];
 
 	QJsonObject doc_obj;
 	doc_obj["peerList"] = peersLst;
@@ -45,8 +47,8 @@ bool ParamsContainer::writeParams(QString file_name)
 	file.close();
 }
 
-QString ParamsContainer::getIp(){return m_my_ip;}
-QMap<QString,QString> ParamsContainer::getPeerList(){return m_peers;}
+QString ParamsContainer::getIp() {return m_my_ip;}
+std::vector<peer_reference> ParamsContainer::getPeerList() {return m_peers;}
 
 void ParamsContainer::setIp(QString my_ip){ m_my_ip = my_ip;}
-void ParamsContainer::setPeerList(QMap<QString,QString> peer_list){m_peers = peer_list;}
+void ParamsContainer::setPeerList(std::vector<peer_reference> &peer_list) {m_peers = peer_list;}

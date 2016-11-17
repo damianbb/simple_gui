@@ -15,9 +15,11 @@ CONFIG += c++14
 TARGET = simpleGui
 TEMPLATE = app
 
+LIBS += -lboost_system
+
 
 SOURCES += main.cpp\
-	mainwindow.cpp \
+    mainwindow.cpp \
     addressdialog.cpp \
     paramscontainer.cpp \
     netparser.cpp \
