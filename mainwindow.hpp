@@ -10,6 +10,7 @@
 #include "addressdialog.hpp"
 #include "dataeater.hpp"
 
+using nlohmann::json;
 
 struct peer_reference {
 	std::string m_ipv4;
@@ -23,7 +24,7 @@ namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow,commandExecutor
+class MainWindow final : public QMainWindow,commandExecutor
 {
 	Q_OBJECT
 
@@ -35,11 +36,12 @@ public:
 
 	void SavePeers(QString file_name);
 
-	virtual void showMsg(const nlohmann::json &msg);
-	virtual void askQuestion(const nlohmann::json &msg) {}
-	virtual void showWorning(const nlohmann::json &msg) {}
-	virtual void writeAns(const nlohmann::json &msg) {}
-	virtual void addPeer(const nlohmann::json &msg) {}
+	void showMsg(const json &msg) override;
+	void askQuestion(const json &msg) override {}
+	void showWorning(const json &msg) override {}
+	void writeAns(const json &msg) override {}
+	void addPeer(const json &msg) override {}
+	void ping() override;
 
 public slots:
 	void onProcessInfo();
@@ -54,27 +56,27 @@ private slots:
 	void on_plusButton_clicked();
 	void onNewConnection();
 	void on_minusButton_clicked();
-
 	void on_actionDebug_triggered();
 
-
 	void startConnection();
+	void on_ping_clicked();
+
+	void onReciveTcp();
+
 private:
 
 
 	void sendReciveTcp(QString &msg);
+
 	QString my_ip;
 	Ui::MainWindow *ui;
 	QProcess *m_tunserver_process;
 	addressDialog *m_dlg;
 	QTcpSocket *m_socket;
 	std::vector <peer_reference> m_peer_lst;
-	dataeater m_data_eater;
+	//dataeater m_data_eater;  // replaced by simple_packet_eater but dataeater is still piece of good code.
+	simple_packet_eater m_packet_eater;
 	netParser m_parser;
-
-	void onReciveTcp();
-
-
 };
 
 

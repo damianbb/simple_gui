@@ -11,6 +11,8 @@
 #include "dataeater.hpp"
 #include "debugdialog.hpp"
 
+#include "trivialserialize.hpp"
+
 #include <boost/asio.hpp>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -44,8 +46,6 @@ MainWindow::MainWindow(QWidget *parent) :
 	for (auto it :tst_msg) {
 		testData.push_back(it);
 	}
-
-
 
 /*
 	dataeater eater;
@@ -84,6 +84,7 @@ void MainWindow::on_connectButton_clicked()
 	}
 	*/
 	startProgram(l_peer_list);
+	startConnection();
 }
 
 void MainWindow::addMsg()
@@ -94,7 +95,6 @@ void MainWindow::addMsg()
 
 void MainWindow::onNewConnection()
 {
-
 	/*
 	QTcpSocket *m_socket = m_msg_server->nextPendingConnection();
 	connect(m_socket,SIGNAL(readyRead()),this,SLOT(addMsg()));
@@ -175,9 +175,10 @@ void MainWindow::onReciveTcp()
 {
 	std::string arr = m_socket->readAll().toStdString();
 
-	m_data_eater.eat(arr);
-	m_data_eater.process();
+	m_packet_eater.eat_packet(arr);
 
+	std::string msg = m_data_eater.getLastCommand();
+	qDebug() << "Arr: " << arr.c_str() << " msg: " << msg.c_str();
 	std::lock_guard<std::mutex> guard(m_order_mutex);
 	execNextOrder();
 }
@@ -214,6 +215,7 @@ void MainWindow::on_minusButton_clicked()
 {
 	auto delete_list= ui->peerListWidget->selectedItems();
 	try{
+		qDebug()<<delete_list.at(0);
 		ui->peerListWidget->removeItemWidget(delete_list.at(0));
 		ui->peerListWidget->update();
 	} catch(...){
@@ -234,7 +236,7 @@ void MainWindow::SavePeers(QString file_name)
 	container.writeParams(file_name);
 }
 
-void MainWindow::showMsg(const nlohmann::json &msg)
+void MainWindow::showMsg(const json &msg)
 {
 	std::cout<<"show new message \n";
 	std::cout<<msg["topic"];
@@ -249,7 +251,7 @@ void MainWindow::startConnection()
 {
 	m_socket = new QTcpSocket(this);
 
-	m_socket->connectToHost("localhost", 8899);
+	m_socket->connectToHost("192.168.1.100", 42000);
 
 	connect(m_socket, SIGNAL(readyRead()),this, SLOT(onReciveTcp()));
 
@@ -260,7 +262,6 @@ void MainWindow::startConnection()
 		}
 }
 
-
 void MainWindow::on_actionDebug_triggered()
 {
 	qDebug()<< "show dlg";
@@ -269,4 +270,34 @@ void MainWindow::on_actionDebug_triggered()
 		dialog.show();
 }
 
+void MainWindow::ping()
+{
+	json ping = {
+					{"cmd","ping"}
+				};
 
+
+	std::string msg = ping.dump();
+	qDebug() << "json msg to send: [" << msg.c_str() << ']';
+
+	std::cout  << "read from json cmd: ";
+	trivialserialize::generator generator(100);
+	qDebug() << msg.size();
+	generator.push_integer_uvarint(msg.size());
+	generator.push_varstring(msg);
+
+	std::string write_msg = std::move(generator.str_move());
+	size_t written = m_socket->write(QByteArray(write_msg.data(), write_msg.size()));
+	if(written != write_msg.size())
+		throw std::runtime_error("Some errors occurred while writing data to m_socket");
+}
+
+void MainWindow::on_ping_clicked()
+{
+   if (m_socket->state() == QAbstractSocket::ConnectedState) {
+		ping();
+   } else {
+	   qDebug()<<"Socket is not connected";
+   }
+
+}
