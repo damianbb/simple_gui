@@ -2,11 +2,10 @@
 #define NETPARSER_H
 
 #include <functional>
-#include <boost/property_tree/json_parser.hpp>
 #include <queue>
-#include "json.hpp"
 #include <mutex>
 
+#include "json.hpp"
 
 class commandExecutor;
 
@@ -39,14 +38,15 @@ class commandExecutor
 public:
 	void addOrder(order_ptr ord){ord_queue.push(ord);}
 
-	virtual void execNextOrder()
-	{
+	// thread safe
+	virtual void execNextOrder() {
+		std::lock_guard<std::mutex>lock(m_order_mutex);
 		if(ord_queue.empty()) {
 			return;
 		}
 
+		std::cout << "new order: [" << ord_queue.front() << std::endl;
 		ord_queue.front()->exec();
-		std::lock_guard<std::mutex>lock(m_order_mutex);
 		ord_queue.pop();
 	}
 
@@ -55,6 +55,7 @@ public:
 	virtual void showWorning(const nlohmann::json & msg) = 0;
 	virtual void writeAns(const nlohmann::json &msg) = 0;
 	virtual void addPeer(const nlohmann::json &msg) = 0;
+	virtual void ping() = 0;
 
 
 	std::mutex m_order_mutex;
@@ -68,9 +69,8 @@ public:
 
 	virtual void exec()
 	{
-		parse();
+		//parse();
 		m_executor->showMsg(m_msg);
-//		std::cout<<"show msg\n";
 	}
 };
 
@@ -83,11 +83,15 @@ public:
 	{
 		nlohmann::json j = nlohmann::json::parse(msg);
 		std::string cmd = j["cmd"];
-		if("info" == cmd) {
+		std::cout << "cmd=" << cmd << '\n';
+		if(cmd == "info") {
 			order_ptr ord(new msgOrder(&m_executor,j));
 			std::lock_guard<std::mutex>lock(m_executor.m_order_mutex);
 			m_executor.addOrder(ord);
-		}else{
+		} else if (cmd == "ping"){
+			order_ptr ord(new msgOrder(&m_executor,j));
+			std::lock_guard<std::mutex>lock(m_executor.m_order_mutex);
+			m_executor.addOrder(ord);
 
 		}
 

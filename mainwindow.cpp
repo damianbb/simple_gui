@@ -83,6 +83,10 @@ void MainWindow::on_connectButton_clicked()
 
 	}
 	*/
+   if (m_socket->state() == QAbstractSocket::ConnectedState) {
+		m_socket->disconnectFromHost();
+	}
+
 	startProgram(l_peer_list);
 	startConnection();
 }
@@ -176,10 +180,11 @@ void MainWindow::onReciveTcp()
 	std::string arr = m_socket->readAll().toStdString();
 
 	m_packet_eater.eat_packet(arr);
-
-	std::string msg = m_data_eater.getLastCommand();
+	std::string msg = m_packet_eater.pop_last_message();
 	qDebug() << "Arr: " << arr.c_str() << " msg: " << msg.c_str();
-	std::lock_guard<std::mutex> guard(m_order_mutex);
+
+	m_parser.parseMsg(msg);
+
 	execNextOrder();
 }
 
@@ -239,12 +244,12 @@ void MainWindow::SavePeers(QString file_name)
 void MainWindow::showMsg(const json &msg)
 {
 	std::cout<<"show new message \n";
-	std::cout<<msg["topic"];
-	auto tmp = msg["msg"];
-	std::string text = tmp["text"];
-	ui->debugWidget->addItem(text.c_str());
+	//std::cout<<msg["topic"];
+	std::string tmp = msg["msg"];
+	//std::string text = tmp["text"];
+	ui->debugWidget->addItem(tmp.c_str());
 //	ui->debugWidget->addItem(text);
-	qDebug()<<text.c_str();
+	qDebug()<<tmp.c_str();
 }
 
 void MainWindow::startConnection()
@@ -273,7 +278,8 @@ void MainWindow::on_actionDebug_triggered()
 void MainWindow::ping()
 {
 	json ping = {
-					{"cmd","ping"}
+					{"cmd","ping"},
+					{"msg","ping"}
 				};
 
 

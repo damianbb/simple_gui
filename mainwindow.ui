@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>548</width>
-    <height>423</height>
+    <height>400</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -87,6 +87,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="ping">
+        <property name="text">
+         <string>Ping</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QListWidget" name="debugWidget"/>
       </item>
      </layout>
@@ -99,7 +106,7 @@
      <x>0</x>
      <y>0</y>
      <width>548</width>
-     <height>22</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_Plik">
@@ -121,7 +128,7 @@
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionDebug">
    <property name="text">
-    <string>Debug</string>
+    <string>&amp;Debug</string>
    </property>
   </action>
  </widget>

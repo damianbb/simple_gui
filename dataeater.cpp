@@ -79,18 +79,25 @@ std::string dataeater::getLastCommand()
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::string simple_packet_eater::process_pck(const std::string &pck) {
-	trivialserialize::parser parser(tag_caller_must_keep_this_string_valid, msg_toeat);
+std::string simple_packet_eater::process_packet(const std::string &pck) {
+	trivialserialize::parser parser(trivialserialize::parser::tag_caller_must_keep_this_string_valid(),
+									pck);
 	uint64_t msg_size = parser.pop_integer_uvarint();
+	parser.pop_bytes_n(1);
+	std::cout << "Parsed msg size: " << msg_size << '\n';
 	return parser.pop_bytes_n(msg_size);
 }
 
 void simple_packet_eater::eat_packet(const std::string &pck) {
-	m_msg_queue.push(simple_msgeater::process_pck(pck));
+	m_msg_queue.push(simple_packet_eater::process_packet(pck));
 }
 
 std::string simple_packet_eater::pop_last_message() {
-	auto msg = m_msg_queue.front();
+	if(m_msg_queue.empty()) {
+		return "";
+	}
+	std::string msg = m_msg_queue.front();
 	m_msg_queue.pop();
+	std::cout << "msg=[" << msg << "] size=[" << msg.size() << "]\n";
 	return msg;
 }
