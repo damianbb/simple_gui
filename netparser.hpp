@@ -7,12 +7,14 @@
 
 #include "json.hpp"
 
+using nlohmann::json;
+
 class commandExecutor;
 
 class order
 {
 public:
-	order(commandExecutor *executor,nlohmann::json params):m_executor(executor),m_msg(params){;}
+	order(commandExecutor *executor,json params):m_executor(executor),m_msg(params){;}
 	virtual void exec() = 0;
 	std::string getAns(std::string ans);
 
@@ -23,7 +25,7 @@ protected:
 		m_topic = m_msg["topic"];
 	}
 
-	nlohmann::json m_msg;
+	json m_msg;
 	commandExecutor *m_executor;
 	int m_id;
 	std::string m_topic;
@@ -50,11 +52,12 @@ public:
 		ord_queue.pop();
 	}
 
-	virtual void showMsg(const nlohmann::json &msg) = 0;
-	virtual void askQuestion(const nlohmann::json &msg) = 0;
-	virtual void showWorning(const nlohmann::json & msg) = 0;
-	virtual void writeAns(const nlohmann::json &msg) = 0;
-	virtual void addPeer(const nlohmann::json &msg) = 0;
+	virtual void show_msg(const json &msg) = 0;
+//	virtual void askQuestion(const json &msg) = 0;
+//	virtual void showWorning(const json & msg) = 0;
+//	virtual void writeAns(const json &msg) = 0;
+//	virtual void addPeer(const json &msg) = 0;
+	virtual void send_request(const json &request) = 0;
 	virtual void ping() = 0;
 
 
@@ -62,26 +65,26 @@ public:
 
 };
 
-class msgOrder:public order
-{
+class msgOrder:public order {
+
 public:
-	msgOrder(commandExecutor *executor,nlohmann::json msg):order (executor,msg){;}
+	msgOrder(commandExecutor *executor,json msg):order (executor,msg){;}
 
 	virtual void exec()
 	{
 		//parse();
-		m_executor->showMsg(m_msg);
+		m_executor->show_msg(m_msg);
 	}
 };
 
-class netParser
-{
+class netParser {
+
 public:
 	netParser(commandExecutor &executor):m_executor(executor){;}
 
 	void parseMsg(std::string msg) {
 		if (msg.empty()) return;
-		nlohmann::json j = nlohmann::json::parse(msg);
+		json j = json::parse(msg);
 		std::string cmd = j["cmd"];
 		std::cout << "cmd=" << cmd << '\n';
 		if(cmd == "info") {

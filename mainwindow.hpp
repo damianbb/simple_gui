@@ -6,6 +6,8 @@
 #include <QTcpSocket>
 #include <QVector>
 
+#include <thread>
+
 #include "netparser.hpp"
 #include "addressdialog.hpp"
 #include "dataeater.hpp"
@@ -36,11 +38,12 @@ public:
 
 	void SavePeers(QString file_name);
 
-	void showMsg(const json &msg) override;
-	void askQuestion(const json &msg) override {}
-	void showWorning(const json &msg) override {}
-	void writeAns(const json &msg) override {}
-	void addPeer(const json &msg) override {}
+	void show_msg(const json &msg) override;
+//	void askQuestion(const json &msg) override {}
+//	void showWorning(const json &msg) override {}
+//	void writeAns(const json &msg) override {}
+//	void addPeer(const json &msg) override {}
+	void send_request(const json &request) override;
 	void ping() override;
 
 public slots:
@@ -49,6 +52,7 @@ public slots:
 
 	void addAddress(QString address);
 	void showDebugPage(QByteArray &pageCode);
+
 
 private slots:
 	void on_connectButton_clicked();
@@ -62,8 +66,12 @@ private slots:
 	void onReciveTcp();
 
 private:
+	std::mutex m_mutex;
 
 	void sendReciveTcp(QString &msg);
+	std::unique_ptr<std::thread> th_peerlist;
+
+void call_peerlist_requests(const std::chrono::seconds &time_interval = std::chrono::seconds(10));
 
 	QString my_ip;
 	Ui::MainWindow *ui;
@@ -74,6 +82,9 @@ private:
 	dataeater m_data_eater;  // replaced by simple_packet_eater but dataeater is still piece of good code.
 	simple_packet_eater m_packet_eater;
 	netParser m_parser;
+
+signals:
+	void ask_for_peerlist();
 };
 
 
