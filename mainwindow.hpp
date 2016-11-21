@@ -7,12 +7,15 @@
 #include <QVector>
 
 #include <thread>
+#include <atomic>
+#include <chrono>
 
 #include "netparser.hpp"
 #include "addressdialog.hpp"
 #include "dataeater.hpp"
 
 using nlohmann::json;
+using namespace std::chrono_literals;
 
 struct peer_reference {
 	std::string m_ipv4;
@@ -41,10 +44,9 @@ public:
 	void show_msg(const json &msg) override;
 //	void askQuestion(const json &msg) override {}
 //	void showWorning(const json &msg) override {}
-//	void writeAns(const json &msg) override {}
+//	void writeAns(const jsostartConnectionn &msg) override {}
 //	void addPeer(const json &msg) override {}
 	void send_request(const json &request) override;
-	void ping() override;
 
 public slots:
 	void onProcessInfo();
@@ -64,14 +66,17 @@ private slots:
 	void on_ping_clicked();
 
 	void onReciveTcp();
+	void peerlist_request_slot();
 
 private:
 	std::mutex m_mutex;
-
-	void sendReciveTcp(QString &msg);
+	std::atomic<bool> m_pr_call { false };
 	std::unique_ptr<std::thread> th_peerlist;
 
-void call_peerlist_requests(const std::chrono::seconds &time_interval = std::chrono::seconds(10));
+	bool check_connection();
+
+	void sendReciveTcp(QString &msg);
+	void call_peerlist_requests(const std::chrono::seconds &time_interval = 5s);
 
 	QString my_ip;
 	Ui::MainWindow *ui;
@@ -79,8 +84,7 @@ void call_peerlist_requests(const std::chrono::seconds &time_interval = std::chr
 	addressDialog *m_dlg;
 	QTcpSocket *m_socket;
 	std::vector <peer_reference> m_peer_lst;
-	dataeater m_data_eater;  // replaced by simple_packet_eater but dataeater is still piece of good code.
-	simple_packet_eater m_packet_eater;
+	dataeater m_data_eater;
 	netParser m_parser;
 
 signals:

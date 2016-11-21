@@ -58,7 +58,6 @@ public:
 //	virtual void writeAns(const json &msg) = 0;
 //	virtual void addPeer(const json &msg) = 0;
 	virtual void send_request(const json &request) = 0;
-	virtual void ping() = 0;
 
 
 	std::mutex m_order_mutex;

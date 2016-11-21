@@ -21,7 +21,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui(new Ui::MainWindow),
 	m_tunserver_process(nullptr),
 	m_dlg(nullptr),
-	m_socket(nullptr)
+	m_socket(nullptr),
+	th_peerlist(nullptr)
 {
 	ui->setupUi(this);
 
@@ -90,15 +91,18 @@ void MainWindow::on_connectButton_clicked()
 
 	}
 	*/
-	if (m_socket != nullptr && m_socket->state() == QAbstractSocket::ConnectedState) {
-		m_socket->disconnectFromHost();
+	m_pr_call = false;
+	if (th_peerlist != nullptr && th_peerlist->joinable()) {
+		th_peerlist->join();
 		th_peerlist.reset(nullptr);
+	}
+	if (check_connection()) {
+		m_socket->disconnectFromHost();
 	}
 
 	startProgram(l_peer_list);
 	startConnection();
 
-	th_peerlist = std::make_unique<std::thread>([this]() { call_peerlist_requests(); });
 }
 
 peer_reference peer_reference::get_validated_ref(std::string ref) {
@@ -188,6 +192,27 @@ void MainWindow::onReciveTcp()
 	execNextOrder();
 }
 
+void MainWindow::peerlist_request_slot() {
+	if (check_connection())
+		send_request( {
+						  {"cmd","peer_list"}
+					} );
+}
+
+bool MainWindow::check_connection() {
+	std::lock_guard<std::mutex> socekt_lock(m_mutex);
+
+	if(m_socket == nullptr) {
+		qDebug()<<"Socket is not defined (nullptr)";
+		return false;
+	} else if (m_socket->state() != QAbstractSocket::ConnectedState) {
+		qDebug()<<"Socket is not connected";
+		return false;
+	} else {
+		return true;
+	}
+}
+
 void MainWindow::sendReciveTcp(QString &msg) {
 
 }
@@ -197,18 +222,18 @@ void MainWindow::showDebugPage(QByteArray &pageCode) {
 
 }
 
-void MainWindow::onProcessInfo()
-{
+void MainWindow::onProcessInfo() {
+
 	qDebug()<<m_tunserver_process->readAll();
 }
 
-void MainWindow::onProcessError()
-{
+void MainWindow::onProcessError() {
+
 	qDebug()<<m_tunserver_process->readAll();
 }
 
-void MainWindow::on_plusButton_clicked()
-{
+void MainWindow::on_plusButton_clicked() {
+
 	m_dlg = new addressDialog(this);
 	connect (m_dlg,SIGNAL(addAddress(QString)),this,SLOT(addAddress(QString)));
 	m_dlg->show();
@@ -241,7 +266,7 @@ void MainWindow::SavePeers(QString file_name)
 
 void MainWindow::show_msg(const json &msg)
 {
-	std::cout<<"show new message \n";
+	qDebug()<<"show new message \n";
 	//std::cout<<msg["topic"];
 	std::string tmp = msg["msg"];
 	//std::string text = tmp["text"];
@@ -250,40 +275,35 @@ void MainWindow::show_msg(const json &msg)
 	qDebug()<<tmp.c_str();
 }
 
-void MainWindow::ask_for_peerlist() {
-	send_request( {{"cmd","peer_list"}} );
-}
-
 void MainWindow::call_peerlist_requests(const std::chrono::seconds &time_interval) {
 
-	while(true) {
+	while(m_pr_call == true) {
 
 		std::this_thread::yield();
 		std::this_thread::sleep_for(time_interval);
 
-		//std::lock_guard<std::mutex> lock(m_mutex);
-		//if (m_socket != nullptr && m_socket->state() != QAbstractSocket::ConnectedState) {
-		//	break;
-		//}
-		//emit send_request( {{"cmd","peer_list"}} );
+		qDebug() << "pr_call:" << m_pr_call << '\n';
 		emit ask_for_peerlist();
 	}
+	qDebug() << "pr_call:" << m_pr_call << '\n';
 }
 
 void MainWindow::startConnection()
 {
 	m_socket = new QTcpSocket(this);
 
-	m_socket->connectToHost("192.168.1.100", 42000);
+	m_socket->connectToHost("localhost", 42000);
 
 	connect(m_socket, SIGNAL(readyRead()),this, SLOT(onReciveTcp()));
-	connect(this, SIGNAL(ask_for_peerlist()),this, SLOT(onReciveTcp()));
+	m_pr_call = true;
+	connect(this, SIGNAL(ask_for_peerlist()),this, SLOT(peerlist_request_slot()));
 
 		// we need to wait...
 		if(!m_socket->waitForConnected(5000))
 		{
 			qDebug() << "Error: " << m_socket->errorString();
 		}
+	th_peerlist = std::make_unique<std::thread>([this]() { call_peerlist_requests(); });
 }
 
 void MainWindow::on_actionDebug_triggered()
@@ -299,36 +319,15 @@ void MainWindow::send_request(const json &request) {
 
 	qDebug() << "json msg to send: [" << msg.c_str() << ']';
 	std::vector<uint8_t> packet  = simple_packet_eater::serialize_msg(msg);
-
 	size_t written = m_socket->write(QByteArray(reinterpret_cast<const char*>(packet.data()), packet.size()));
 	if(written != packet.size())
 		throw std::runtime_error("Some errors occurred while writing data to m_socket");
 }
 
-
-void MainWindow::ping() {
-
-	json ping = {
-					{"cmd","ping"},
-					{"msg","ping"}
-				};
-
-
-	std::string msg = ping.dump();
-	qDebug() << "json msg to send: [" << msg.c_str() << ']';
-	std::vector<uint8_t> packet  = simple_packet_eater::serialize_msg(msg);
-
-	size_t written = m_socket->write(QByteArray(reinterpret_cast<const char*>(packet.data()), packet.size()));
-	if(written != packet.size())
-		throw std::runtime_error("Some errors occurred while writing data to m_socket");
-}
-
-void MainWindow::on_ping_clicked()
-{
-   if (m_socket != nullptr && m_socket->state() == QAbstractSocket::ConnectedState) {
-		ping();
-   } else {
-	   qDebug()<<"Socket is not connected";
-   }
-
+void MainWindow::on_ping_clicked() {
+	if (check_connection())
+		send_request( {
+						{"cmd","ping"},
+						{"msg","ping"}
+					} );
 }
