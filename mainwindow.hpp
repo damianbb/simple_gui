@@ -48,13 +48,11 @@ public slots:
 	void onProcessError();
 
 	void addAddress(QString address);
-	void addMsg();
 	void showDebugPage(QByteArray &pageCode);
 
 private slots:
 	void on_connectButton_clicked();
 	void on_plusButton_clicked();
-	void onNewConnection();
 	void on_minusButton_clicked();
 	void on_actionDebug_triggered();
 
@@ -65,7 +63,6 @@ private slots:
 
 private:
 
-
 	void sendReciveTcp(QString &msg);
 
 	QString my_ip;
@@ -74,7 +71,7 @@ private:
 	addressDialog *m_dlg;
 	QTcpSocket *m_socket;
 	std::vector <peer_reference> m_peer_lst;
-	//dataeater m_data_eater;  // replaced by simple_packet_eater but dataeater is still piece of good code.
+	dataeater m_data_eater;  // replaced by simple_packet_eater but dataeater is still piece of good code.
 	simple_packet_eater m_packet_eater;
 	netParser m_parser;
 };

@@ -16,8 +16,12 @@
 #include <boost/asio.hpp>
 
 MainWindow::MainWindow(QWidget *parent) :
-	QMainWindow(parent),m_parser(*this),
-	ui(new Ui::MainWindow)
+	QMainWindow(parent),
+	m_parser(*this),
+	ui(new Ui::MainWindow),
+	m_tunserver_process(nullptr),
+	m_dlg(nullptr),
+	m_socket(nullptr)
 {
 	ui->setupUi(this);
 
@@ -65,6 +69,9 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
 	delete ui;
+	delete m_tunserver_process;
+	delete m_dlg;
+	delete m_socket;
 }
 
 void MainWindow::on_connectButton_clicked()
@@ -83,26 +90,12 @@ void MainWindow::on_connectButton_clicked()
 
 	}
 	*/
-   if (m_socket->state() == QAbstractSocket::ConnectedState) {
+	if (m_socket != nullptr && m_socket->state() == QAbstractSocket::ConnectedState) {
 		m_socket->disconnectFromHost();
 	}
 
 	startProgram(l_peer_list);
 	startConnection();
-}
-
-void MainWindow::addMsg()
-{
-	QString msg = m_socket->readAll();
-	ui->debugWidget->addItem(msg);
-}
-
-void MainWindow::onNewConnection()
-{
-	/*
-	QTcpSocket *m_socket = m_msg_server->nextPendingConnection();
-	connect(m_socket,SIGNAL(readyRead()),this,SLOT(addMsg()));
-	*/
 }
 
 peer_reference peer_reference::get_validated_ref(std::string ref) {
@@ -179,11 +172,16 @@ void MainWindow::onReciveTcp()
 {
 	std::string arr = m_socket->readAll().toStdString();
 
-	m_packet_eater.eat_packet(arr);
-	std::string msg = m_packet_eater.pop_last_message();
-	qDebug() << "Arr: " << arr.c_str() << " msg: " << msg.c_str();
+	m_data_eater.eat(arr);
+	m_data_eater.process();
+	std::string last_cmd = m_data_eater.getLastCommand();
+	std::cout << "Last cmd: " << last_cmd << '\n';
+	m_parser.parseMsg(last_cmd);
 
-	m_parser.parseMsg(msg);
+	//m_packet_eater.eat_packet(arr);
+	//std::string msg = m_packet_eater.pop_last_message();
+	//qDebug() << "Arr: " << arr.c_str() << " msg: " << msg.c_str();
+	//m_parser.parseMsg(msg);
 
 	execNextOrder();
 }
@@ -285,22 +283,16 @@ void MainWindow::ping()
 
 	std::string msg = ping.dump();
 	qDebug() << "json msg to send: [" << msg.c_str() << ']';
+	std::vector<uint8_t> packet  = simple_packet_eater::serialize_msg(msg);
 
-	std::cout  << "read from json cmd: ";
-	trivialserialize::generator generator(100);
-	qDebug() << msg.size();
-	generator.push_integer_uvarint(msg.size());
-	generator.push_varstring(msg);
-
-	std::string write_msg = std::move(generator.str_move());
-	size_t written = m_socket->write(QByteArray(write_msg.data(), write_msg.size()));
-	if(written != write_msg.size())
+	size_t written = m_socket->write(QByteArray(reinterpret_cast<const char*>(packet.data()), packet.size()));
+	if(written != packet.size())
 		throw std::runtime_error("Some errors occurred while writing data to m_socket");
 }
 
 void MainWindow::on_ping_clicked()
 {
-   if (m_socket->state() == QAbstractSocket::ConnectedState) {
+   if (m_socket != nullptr && m_socket->state() == QAbstractSocket::ConnectedState) {
 		ping();
    } else {
 	   qDebug()<<"Socket is not connected";

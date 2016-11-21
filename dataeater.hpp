@@ -5,38 +5,39 @@
 #include <memory>
 #include <queue>
 
-class dataeater
-{
-	std::queue<char> m_internal_buffer;
-	std::queue<std::string> m_commands_list;
-	std::string m_last_command;
-
-	bool m_have_new;
-	bool m_is_processing;
-
-	int m_frame_size;
-	int m_current_index;
-
-	bool processFresh();
-	bool continiueProcessing();
-
+class dataeater {
 public:
-	dataeater():m_have_new(false),m_is_processing(false){;}
+	dataeater(): m_is_processing(false){;}
 
-
-	void eat(std::vector<char> &data);
+	void eat(std::vector<uint8_t> &data);
 	void eat(std::string &data);
 	void process();
 	bool hasNextCommand();
 	std::string getLastCommand();
 
+private:
+	std::queue<uint8_t> m_internal_buffer;
+	std::queue<std::string> m_commands_list;
+	std::string m_last_command;
 
+	uint16_t pop_msg_size();
+	bool processFresh();
+	bool continiueProcessing();
+
+	bool m_is_processing;
+
+	int m_frame_size;
+	int m_current_index;
 };
 
 // using trivialserialize
 class simple_packet_eater {
 public:
 	static std::string process_packet(const std::string &pck);
+
+	static std::vector<uint8_t> serialize_msg(const std::string &msg);
+	static std::string deserialize_msg(const std::vector<uint8_t> &packet);
+
 	void eat_packet(const std::string &pck);
 	std::string pop_last_message();
 

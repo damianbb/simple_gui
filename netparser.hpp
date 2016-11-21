@@ -79,8 +79,8 @@ class netParser
 public:
 	netParser(commandExecutor &executor):m_executor(executor){;}
 
-	void parseMsg(std::string msg)
-	{
+	void parseMsg(std::string msg) {
+		if (msg.empty()) return;
 		nlohmann::json j = nlohmann::json::parse(msg);
 		std::string cmd = j["cmd"];
 		std::cout << "cmd=" << cmd << '\n';

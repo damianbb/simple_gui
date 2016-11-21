@@ -1,63 +1,67 @@
 #include "dataeater.hpp"
 #include <iostream>
+#include <cstring>
+
 #include "trivialserialize.hpp"
 
-void dataeater::eat(std::vector<char> &data)
-{
-	for(const auto &it:data) m_internal_buffer.push(it);
+void dataeater::eat(std::vector<uint8_t> &data) {
+	for(const auto &i:data) m_internal_buffer.push(i);
 }
 
-void dataeater::eat(std::string &data)
-{
-	for(const auto &it:data) m_internal_buffer.push(it);
-
+void dataeater::eat(std::string &data) {
+	static_assert(sizeof(char) == sizeof(uint8_t), "size of char are different than size of uint8_t");
+	for(const auto i:data) {
+		uint8_t que_ele;
+		memcpy(&que_ele,&i,sizeof(uint8_t));
+		m_internal_buffer.push(que_ele);
+	}
 }
 
-void dataeater::process()
-{
-	if(!m_is_processing)
-	{
+void dataeater::process() {
+
+	if(!m_is_processing) {
 		processFresh();
-	}else{
+	} else {
 		continiueProcessing();
 	}
 }
 
-bool dataeater::processFresh()
-{
+uint16_t dataeater::pop_msg_size() {
+	uint16_t msg_size;
+	msg_size = m_internal_buffer.front() << 8;
+	m_internal_buffer.pop();
+	msg_size += m_internal_buffer.front();
+	m_internal_buffer.pop();
+	return msg_size;
+}
+
+bool dataeater::processFresh() {
 	// change 4 to 2 because of no 0xff at the begin of packet
-	if (m_internal_buffer.size() < 3){
+	if (m_internal_buffer.size() < 2){
 		return false;
 	}
 
 	// Is it really neccessary?
-	//if(char (m_internal_buffer.front()) != char(0xff)) {		//frame should start with 0xff. If not - something goes wrong
+	//if(char (m_internal_buffer.front()) != char(0xff)) {	//frame should start with 0xff. If not - something goes wrong
 	//	m_internal_buffer.pop();
 	//	return false;
 	//}
 
-	m_internal_buffer.pop();
-
-	char size_tab[2];
-	size_tab[0] = m_internal_buffer.front();m_internal_buffer.pop();
-	size_tab[1] = m_internal_buffer.front();m_internal_buffer.pop();
-
-	m_frame_size = reinterpret_cast<int16_t&>(*size_tab);
+	m_frame_size = pop_msg_size();
 
 	std::cout << "qframe size = " << m_frame_size << std::endl;
 
-	m_current_index = 3;
+	m_current_index = 0;
 	continiueProcessing();
-	m_is_processing = true;
+	return m_is_processing = true;
 }
 
-bool dataeater::continiueProcessing()
-{
+bool dataeater::continiueProcessing() {
+
 	while (!m_internal_buffer.empty()) {
 		if (m_frame_size == m_current_index) {
 			m_commands_list.push(m_last_command);
 			m_last_command.clear();
-			m_have_new = true;
 			m_is_processing= false;
 			processFresh();
 			return true;
@@ -66,20 +70,47 @@ bool dataeater::continiueProcessing()
 		}
 		m_current_index++;
 	}
+	return m_is_processing;
 }
 
-std::string dataeater::getLastCommand()
-{
+std::string dataeater::getLastCommand() {
+
 	if(m_commands_list.empty()) {
 		return std::string();
 	}
-
 	return std::string (m_commands_list.back());
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+std::vector<uint8_t> simple_packet_eater::serialize_msg(const std::string &msg) {
+	assert(msg.size() <= std::numeric_limits<uint16_t>::max() && "Too big message");
+	uint16_t msg_size = msg.size();
+
+	std::vector<uint8_t> packet(msg_size+2); // 2 is bytes for size
+
+	packet[0] = msg_size >> 8;
+	packet[1] = msg_size & 0xFF;
+
+	for (int i = 0; i < msg_size; ++i) {
+		packet.at(i + 2) = msg.at(i);
+	}
+	return packet;
+}
+
+std::string simple_packet_eater::deserialize_msg(const std::vector<uint8_t> &packet) {
+	uint16_t msg_size;
+	msg_size = packet[0] << 8;
+	msg_size += packet[1];
+	std::string msg(msg_size, 0);
+	for (size_t i = 0; i < msg_size; ++i) {
+		msg.at(i) = packet.at(i + 2);
+	}
+	return msg;
+}
+
 std::string simple_packet_eater::process_packet(const std::string &pck) {
+
 	trivialserialize::parser parser(trivialserialize::parser::tag_caller_must_keep_this_string_valid(),
 									pck);
 	uint64_t msg_size = parser.pop_integer_uvarint();

@@ -10,7 +10,7 @@ greaterThan(QT_MAJOR_VERSION, 4.8): QT += widgets
 QMAKE_CC = gcc
 QMAKE_CXX = g++
 CONFIG += c++14
-#QMAKE_CXXFLAGS += -std=c++14
+QMAKE_CXXFLAGS += -std=c++14
 
 TARGET = simpleGui
 TEMPLATE = app
@@ -18,7 +18,8 @@ TEMPLATE = app
 LIBS += -lboost_system
 
 
-SOURCES += main.cpp\
+SOURCES += \
+    main.cpp \
     mainwindow.cpp \
     addressdialog.cpp \
     paramscontainer.cpp \
@@ -26,9 +27,11 @@ SOURCES += main.cpp\
     commandparser.cpp \
     dataeater.cpp \
     netmgr.cpp \
-    debugdialog.cpp
+    debugdialog.cpp \
+    trivialserialize.cpp
 
-HEADERS  += mainwindow.hpp \
+HEADERS += \
+    mainwindow.hpp \
     addressdialog.hpp \
     paramscontainer.hpp \
     netparser.hpp \
@@ -37,9 +40,11 @@ HEADERS  += mainwindow.hpp \
     commandexecutor.hpp \
     json.hpp \
     netmgr.hpp \
-    debugdialog.hpp
+    debugdialog.hpp \
+    trivialserialize.hpp
 
-FORMS    += mainwindow.ui \
+FORMS += \
+    mainwindow.ui \
     addressdialog.ui \
     debugdialog.ui
 
