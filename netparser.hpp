@@ -25,6 +25,7 @@ protected:
 	commandExecutor *m_executor;
 	int m_id;
 	std::string m_topic;
+	std::string m_cmd;
 };
 
 typedef std::shared_ptr<order> order_ptr;	//TODO przerobic na unique_ptr
@@ -41,6 +42,7 @@ public:
 	virtual void execNextOrder();
 
 	virtual void show_msg(const json &msg) = 0;
+	virtual void show_msg_array(const json &msg) = 0;
 //	virtual void askQuestion(const json &msg) = 0;
 //	virtual void showWorning(const json & msg) = 0;
 //	virtual void writeAns(const json &msg) = 0;

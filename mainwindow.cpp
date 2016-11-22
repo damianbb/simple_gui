@@ -276,6 +276,17 @@ void MainWindow::show_msg(const json &msg)
 	qDebug()<<tmp.c_str();
 }
 
+void MainWindow::show_msg_array(const nlohmann::json &msg) {
+	qDebug() << "show message as array\n";
+	std::vector<std::string> messages = msg["msg"];
+	ui->peerListWidget->clear();
+	for (const auto &element : messages) {
+		ui->debugWidget->addItem(element.c_str());
+		qDebug() << element.c_str();
+		ui->peerListWidget->addItem(QString(element.c_str()));
+	}
+}
+
 void MainWindow::call_peerlist_requests(const std::chrono::seconds &time_interval) {
 
 	while(m_pr_call == true) {
