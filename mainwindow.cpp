@@ -17,12 +17,12 @@
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
-	m_parser(*this),
+	th_peerlist(nullptr),
 	ui(new Ui::MainWindow),
 	m_tunserver_process(nullptr),
 	m_dlg(nullptr),
 	m_socket(nullptr),
-	th_peerlist(nullptr)
+	m_parser(*this)
 {
 	ui->setupUi(this);
 

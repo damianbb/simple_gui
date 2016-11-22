@@ -1,9 +1,11 @@
 #include "netparser.hpp"
 
-
-
-
-order::order(commandExecutor *executor, nlohmann::json params):m_executor(executor),m_msg(params){;}
+order::order(commandExecutor *executor, nlohmann::json params)
+:
+	m_msg(params),
+	m_executor(executor)
+{
+}
 
 void order::parse()
 {
@@ -11,7 +13,9 @@ void order::parse()
 	m_topic = m_msg["topic"];
 }
 
-void commandExecutor::addOrder(order_ptr ord){ord_queue.push(ord);}
+void commandExecutor::addOrder(order_ptr ord) {
+	ord_queue.push(ord);
+}
 
 void commandExecutor::execNextOrder() {
 	std::lock_guard<std::mutex>lock(m_order_mutex);

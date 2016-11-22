@@ -11,12 +11,12 @@ using nlohmann::json;
 
 class commandExecutor;
 
-class order
-{
+class order {
 public:
 	order(commandExecutor *executor,json params);
 	virtual void exec() = 0;
 	std::string getAns(std::string ans);
+	virtual ~order() = default;
 
 protected:
 	virtual void parse();
@@ -34,6 +34,7 @@ class commandExecutor
 	std::queue<order_ptr> ord_queue;
 
 public:
+	virtual ~commandExecutor() = default;
 	void addOrder(order_ptr ord);
 
 	// thread safe
