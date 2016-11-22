@@ -42,7 +42,7 @@ public:
 	void SavePeers(QString file_name);
 
 	void show_msg(const json &msg) override;
-	void show_msg_array(const json &msg) override;
+	void show_peers(const json &msg) override;
 //	void askQuestion(const json &msg) override {}
 //	void showWorning(const json &msg) override {}
 //	void writeAns(const jsostartConnectionn &msg) override {}

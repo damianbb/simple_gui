@@ -42,7 +42,7 @@ public:
 	virtual void execNextOrder();
 
 	virtual void show_msg(const json &msg) = 0;
-	virtual void show_msg_array(const json &msg) = 0;
+	virtual void show_peers(const json &msg) = 0;
 //	virtual void askQuestion(const json &msg) = 0;
 //	virtual void showWorning(const json & msg) = 0;
 //	virtual void writeAns(const json &msg) = 0;

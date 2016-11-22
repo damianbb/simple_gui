@@ -276,7 +276,7 @@ void MainWindow::show_msg(const json &msg)
 	qDebug()<<tmp.c_str();
 }
 
-void MainWindow::show_msg_array(const nlohmann::json &msg) {
+void MainWindow::show_peers(const nlohmann::json &msg) {
 	qDebug() << "show message as array\n";
 	std::vector<std::string> messages = msg["msg"];
 	ui->peerListWidget->clear();

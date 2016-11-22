@@ -32,7 +32,7 @@ void commandExecutor::execNextOrder() {
 void msgOrder::exec() {
 	parse();
 	if (m_cmd == "peer_list")
-		m_executor->show_msg_array(m_msg);
+		m_executor->show_peers(m_msg);
 	else
 		m_executor->show_msg(m_msg);
 }
