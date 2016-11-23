@@ -9,3 +9,7 @@ void commandExecutor::parseMsg(const std::string &msg) {
 		// exec ping
 	}
 }
+
+void commandExecutor::sendNetRequest(const order &ord) {
+
+}

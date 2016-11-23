@@ -20,9 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	th_peerlist(nullptr),
 	ui(new Ui::MainWindow),
 	m_tunserver_process(nullptr),
-	m_dlg(nullptr),
-	m_socket(nullptr),
-	m_parser(*this)
+	m_dlg(nullptr)
 {
 	ui->setupUi(this);
 
@@ -174,24 +172,6 @@ void MainWindow::startProgram(QStringList & l_peer_list)
 	m_tunserver_process->start(command , params_list);
 }
 
-void MainWindow::onReciveTcp()
-{
-	QByteArray data_array = m_socket->readAll();
-	std::string arr(data_array.data(), static_cast<size_t>(data_array.size()));
-
-	m_data_eater.eat(arr);
-	m_data_eater.process();
-	std::string last_cmd = m_data_eater.getLastCommand();
-	std::cout << "Last cmd: " << last_cmd << '\n';
-	m_parser.parseMsg(last_cmd);
-
-	//m_packet_eater.eat_packet(arr);
-	//std::string msg = m_packet_eater.pop_last_message();
-	//qDebug() << "Arr: " << arr.c_str() << " msg: " << msg.c_str();
-	//m_parser.parseMsg(msg);
-
-	execNextOrder();
-}
 
 void MainWindow::peerlist_request_slot() {
 	if (check_connection())

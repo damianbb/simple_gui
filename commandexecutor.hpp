@@ -8,10 +8,11 @@
 class order final {
 public:
 	order(json params);
-	virtual ~order() = default;
+	~order() = default;
+	std::string get_str();
 
-protected:
-	virtual void parse();
+private:
+	void parse();
 
 /*	json m_msg;
 	std::string m_cmd;
@@ -20,10 +21,11 @@ protected:
 };
 
 
-class commandExecutor final{
+class commandExecutor final {
 	public:
 		commandExecutor(const std::shared_ptr<MainWindow> &window);
-		void parseMsg(const std::string &msg);
+		void parseMsg(const std::string &msg); ///< parse network msg
+		void sendNetRequest(const order &ord);
 
 	private:
 		std::weak_ptr<MainWindow> m_main_window;
