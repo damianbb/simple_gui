@@ -1,11 +1,34 @@
 #ifndef COMMANDEXECUTOR_H
 #define COMMANDEXECUTOR_H
 
-class commandExecutor
-{
-	void showMessage();
-	void askQuestion();
-	void showWarrning();
+#include "mainwindow.hpp"
+#include "netclient.hpp"
+#include <memory>
+
+class order final {
+public:
+	order(json params);
+	virtual ~order() = default;
+
+protected:
+	virtual void parse();
+
+/*	json m_msg;
+	std::string m_cmd;
+	int m_id;*/
+	std::string m_msg;
+};
+
+
+class commandExecutor final{
+	public:
+		commandExecutor(const std::shared_ptr<MainWindow> &window);
+		void parseMsg(const std::string &msg);
+
+	private:
+		std::weak_ptr<MainWindow> m_main_window;
+		std::shared_ptr<netClient> m_net_client;
+//		std::queue<order> ord_queue;
 };
 
 #endif // COMMANDEXECUTOR_H

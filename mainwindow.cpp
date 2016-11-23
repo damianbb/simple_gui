@@ -265,7 +265,7 @@ void MainWindow::SavePeers(QString file_name)
 	container.writeParams(file_name);
 }
 
-void MainWindow::show_msg(const json &msg)
+/*void MainWindow::show_msg(const json &msg)
 {
 	qDebug()<<"show new message \n";
 	//std::cout<<msg["topic"];
@@ -285,7 +285,7 @@ void MainWindow::show_peers(const nlohmann::json &msg) {
 		qDebug() << element.c_str();
 		ui->peerListWidget->addItem(QString(element.c_str()));
 	}
-}
+}*/
 
 void MainWindow::call_peerlist_requests(const std::chrono::seconds &time_interval) {
 
@@ -326,7 +326,7 @@ void MainWindow::on_actionDebug_triggered()
 		dialog.show();
 }
 
-void MainWindow::send_request(const json &request) {
+/*void MainWindow::send_request(const json &request) {
 	std::string msg = request.dump();
 
 	qDebug() << "json msg to send: [" << msg.c_str() << ']';
@@ -335,7 +335,7 @@ void MainWindow::send_request(const json &request) {
 	if(written != packet.size())
 		throw std::runtime_error("Some errors occurred while writing data to m_socket");
 }
-
+*/
 void MainWindow::on_ping_clicked() {
 	if (check_connection())
 		send_request( {

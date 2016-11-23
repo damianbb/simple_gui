@@ -29,7 +29,7 @@ namespace Ui {
 class MainWindow;
 }
 
-class MainWindow final : public QMainWindow,commandExecutor
+class MainWindow final : public QMainWindow
 {
 	Q_OBJECT
 
@@ -40,14 +40,6 @@ public:
 	void startProgram(QStringList &l_params_list);
 
 	void SavePeers(QString file_name);
-
-	void show_msg(const json &msg) override;
-	void show_peers(const json &msg) override;
-//	void askQuestion(const json &msg) override {}
-//	void showWorning(const json &msg) override {}
-//	void writeAns(const jsostartConnectionn &msg) override {}
-//	void addPeer(const json &msg) override {}
-	void send_request(const json &request) override;
 
 public slots:
 	void onProcessInfo();
@@ -70,6 +62,7 @@ private slots:
 	void peerlist_request_slot();
 
 private:
+	std::shared_ptr<commandExecutor> m_cmd_exec;
 	std::mutex m_mutex;
 	std::atomic<bool> m_pr_call { false };
 	std::unique_ptr<std::thread> th_peerlist;

@@ -28,7 +28,9 @@ SOURCES += \
     dataeater.cpp \
     netmgr.cpp \
     debugdialog.cpp \
-    trivialserialize.cpp
+    trivialserialize.cpp \
+    netclient.cpp \
+    commandexecutor.cpp
 
 HEADERS += \
     mainwindow.hpp \
@@ -41,7 +43,8 @@ HEADERS += \
     json.hpp \
     netmgr.hpp \
     debugdialog.hpp \
-    trivialserialize.hpp
+    trivialserialize.hpp \
+    netclient.hpp
 
 FORMS += \
     mainwindow.ui \
