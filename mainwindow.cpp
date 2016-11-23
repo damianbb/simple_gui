@@ -1,6 +1,7 @@
 #include <QDebug>
 #include <QProcess>
 #include <QTcpSocket>
+#include <QHostAddress>
 
 #include <regex>
 
@@ -12,7 +13,6 @@
 #include "debugdialog.hpp"
 
 #include "trivialserialize.hpp"
-
 #include <boost/asio.hpp>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -92,7 +92,7 @@ void MainWindow::on_connectButton_clicked()
 	}*/
 
 	startProgram(l_peer_list);
-
+	m_cmd_exec->startConnect(QHostAddress(QString("localhost")), 42000);
 }
 
 peer_reference peer_reference::get_validated_ref(std::string ref) {

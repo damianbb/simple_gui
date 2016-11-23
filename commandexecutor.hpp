@@ -25,6 +25,7 @@ class commandExecutor final {
 		commandExecutor(const std::shared_ptr<MainWindow> &window);
 		void parseAndExecMsg(const std::string &msg); ///< parse network msg
 		void sendNetRequest(const order &ord); ///< send order via network
+		void startConnect(const QHostAddress &address, uint16_t port);
 
 	private:
 		std::weak_ptr<MainWindow> m_main_window;
