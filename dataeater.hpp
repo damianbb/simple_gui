@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <queue>
+#include <QByteArray>
 
 class dataeater {
 public:

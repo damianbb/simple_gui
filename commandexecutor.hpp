@@ -24,8 +24,8 @@ private:
 class commandExecutor final {
 	public:
 		commandExecutor(const std::shared_ptr<MainWindow> &window);
-		void parseMsg(const std::string &msg); ///< parse network msg
-		void sendNetRequest(const order &ord);
+		void parseAndExecMsg(const std::string &msg); ///< parse network msg
+		void sendNetRequest(const order &ord); ///< send order via network
 
 	private:
 		std::weak_ptr<MainWindow> m_main_window;

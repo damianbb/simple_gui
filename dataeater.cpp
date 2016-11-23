@@ -83,17 +83,17 @@ std::string dataeater::getLastCommand() {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::vector<uint8_t> simple_packet_eater::serialize_msg(const std::string &msg) {
+QByteArray simple_packet_eater::serialize_msg(const std::string &msg) {
 	assert(msg.size() <= std::numeric_limits<uint16_t>::max() && "Too big message");
-	uint16_t msg_size = msg.size();
+	uint16_t msg_size = static_cast<uint16_t>(msg.size());
 
-	std::vector<uint8_t> packet(msg_size+2); // 2 is bytes for size
+	QByteArray packet(msg_size + 2, 0); // 2 is bytes for size
 
-	packet[0] = msg_size >> 8;
-	packet[1] = msg_size & 0xFF;
+	packet[0] = static_cast<char>(msg_size >> 8);
+	packet[1] = static_cast<char>(msg_size & 0xFF);
 
-	for (int i = 0; i < msg_size; ++i) {
-		packet.at(i + 2) = msg.at(i);
+	for (unsigned int i = 0; i < msg_size; ++i) {
+		packet[i + 2] = msg.at(i);
 	}
 	return packet;
 }
