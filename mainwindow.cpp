@@ -174,10 +174,10 @@ void MainWindow::startProgram(QStringList & l_peer_list)
 
 
 void MainWindow::peerlist_request_slot() {
-	if (check_connection())
+/*	if (check_connection())
 		send_request( {
 						  {"cmd","peer_list"}
-					} );
+					} );*/
 }
 
 bool MainWindow::check_connection() {
@@ -317,9 +317,9 @@ void MainWindow::on_actionDebug_triggered()
 }
 */
 void MainWindow::on_ping_clicked() {
-	if (check_connection())
+/*	if (check_connection())
 		send_request( {
 						{"cmd","ping"},
 						{"msg","ping"}
-					} );
+					} );*/
 }

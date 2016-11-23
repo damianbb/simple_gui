@@ -7,14 +7,15 @@
 #include <QVector>
 
 #include <thread>
+#include <mutex>
 #include <atomic>
 #include <chrono>
 
 #include "netparser.hpp"
 #include "addressdialog.hpp"
 #include "dataeater.hpp"
+#include "commandexecutor.hpp"
 
-using nlohmann::json;
 using namespace std::chrono_literals;
 
 struct peer_reference {
@@ -28,6 +29,8 @@ struct peer_reference {
 namespace Ui {
 class MainWindow;
 }
+
+class commandExecutor;
 
 class MainWindow final : public QMainWindow
 {
@@ -58,7 +61,6 @@ private slots:
 	void startConnection();
 	void on_ping_clicked();
 
-	void onReciveTcp();
 	void peerlist_request_slot();
 
 private:
@@ -79,7 +81,6 @@ private:
 	QTcpSocket *m_socket;
 	std::vector <peer_reference> m_peer_lst;
 	dataeater m_data_eater;
-	netParser m_parser;
 
 signals:
 	void ask_for_peerlist();

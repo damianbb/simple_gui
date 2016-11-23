@@ -3,6 +3,9 @@
 
 #include <QTcpSocket>
 #include "dataeater.hpp"
+#include "commandexecutor.hpp"
+
+class commandExecutor;
 
 class netClient final : QObject {
 	public:

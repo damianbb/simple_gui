@@ -32,7 +32,7 @@ bool netClient::is_connected() {
 		qDebug()<<"Socket is not defined (nullptr)";
 		return false;
 	}
-	else if (m_socket.state() != QAbstractSocket::ConnectedState) {
+	else if (m_socket->state() != QAbstractSocket::ConnectedState) {
 		qDebug()<<"Socket is not connected";
 		return false;
 	} else {
@@ -55,7 +55,7 @@ void netClient::onTcpReceive() {
 	std::string last_cmd = m_data_eater.getLastCommand();
 	if (!last_cmd.empty()) {
 		auto cmd_exec_ptr = m_cmd_exec.lock();
-		cmd_exec_ptr->parseMsg(last_cmd);
+		cmd_exec_ptr->parseAndExecMsg(last_cmd);
 	}
 }
 

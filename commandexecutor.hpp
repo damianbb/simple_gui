@@ -3,13 +3,14 @@
 
 #include "mainwindow.hpp"
 #include "netclient.hpp"
+#include "json.hpp"
 #include <memory>
 
 class order final {
 public:
-	order(json params);
+	order(nlohmann::json params);
 	~order() = default;
-	std::string get_str();
+	std::string get_str() const;
 
 private:
 	void parse();
@@ -20,6 +21,8 @@ private:
 	std::string m_msg;
 };
 
+class MainWindow;
+class netClient;
 
 class commandExecutor final {
 	public:

@@ -31,19 +31,5 @@ private:
 	int m_current_index;
 };
 
-// using trivialserialize
-class simple_packet_eater {
-public:
-	static std::string process_packet(const std::string &pck);
-
-	static std::vector<uint8_t> serialize_msg(const std::string &msg);
-	static std::string deserialize_msg(const std::vector<uint8_t> &packet);
-
-	void eat_packet(const std::string &pck);
-	std::string pop_last_message();
-
-private:
-	std::queue<std::string> m_msg_queue;
-};
 
 #endif // DATAEATER_H
