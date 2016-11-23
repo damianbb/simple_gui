@@ -58,29 +58,17 @@ private slots:
 	void on_minusButton_clicked();
 	void on_actionDebug_triggered();
 
-	void startConnection();
 	void on_ping_clicked();
 
 	void peerlist_request_slot();
 
 private:
 	std::shared_ptr<commandExecutor> m_cmd_exec;
-	std::mutex m_mutex;
-	std::atomic<bool> m_pr_call { false };
-	std::unique_ptr<std::thread> th_peerlist;
 
-	bool check_connection();
-
-	void sendReciveTcp(QString &msg);
-	void call_peerlist_requests(const std::chrono::seconds &time_interval = 5s);
-
-	QString my_ip;
 	Ui::MainWindow *ui;
 	QProcess *m_tunserver_process;
 	addressDialog *m_dlg;
-	QTcpSocket *m_socket;
 	std::vector <peer_reference> m_peer_lst;
-	dataeater m_data_eater;
 
 signals:
 	void ask_for_peerlist();

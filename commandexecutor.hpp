@@ -13,11 +13,7 @@ public:
 	std::string get_str() const;
 
 private:
-	void parse();
-
-/*	json m_msg;
 	std::string m_cmd;
-	int m_id;*/
 	std::string m_msg;
 };
 
@@ -33,7 +29,6 @@ class commandExecutor final {
 	private:
 		std::weak_ptr<MainWindow> m_main_window;
 		std::shared_ptr<netClient> m_net_client;
-//		std::queue<order> ord_queue;
 };
 
 #endif // COMMANDEXECUTOR_H

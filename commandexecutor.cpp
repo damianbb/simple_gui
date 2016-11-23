@@ -15,5 +15,6 @@ void commandExecutor::sendNetRequest(const order &ord) {
 }
 
 std::string order::get_str() const {
-	return std::string(); // TODO
+	nlohmann::json j{{"cmd", m_cmd} , {"msg", m_msg}};
+	return j.dump();
 }
