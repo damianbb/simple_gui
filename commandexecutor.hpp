@@ -5,6 +5,7 @@
 #include "netclient.hpp"
 #include "json.hpp"
 #include <memory>
+#include <QTimer>
 
 class order final {
 public:
@@ -12,10 +13,12 @@ public:
 			PING,
 			PEER_LIST
 		};
-	//order(nlohmann::json params);
+	order(const std::string &json_str);
 	order(e_type cmd);
 	~order() = default;
 	std::string get_str() const;
+	std::string get_cmd() const;
+	std::string get_msg() const;
 
 private:
 	std::string m_cmd;
@@ -25,7 +28,8 @@ private:
 class MainWindow;
 class netClient;
 
-class commandExecutor final : public std::enable_shared_from_this<commandExecutor> {
+class commandExecutor final : public QObject {
+		Q_OBJECT
 	public:
 		static std::shared_ptr<commandExecutor> construct(std::shared_ptr<MainWindow> window);
 		void parseAndExecMsg(const std::string &msg); ///< parse network msg
@@ -36,6 +40,9 @@ class commandExecutor final : public std::enable_shared_from_this<commandExecuto
 	private:
 		std::weak_ptr<MainWindow> m_main_window;
 		std::shared_ptr<netClient> m_net_client;
+		std::unique_ptr<QTimer> m_timer;
+	private slots:
+		void timer_slot();
 };
 
 #endif // COMMANDEXECUTOR_H
