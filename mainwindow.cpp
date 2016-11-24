@@ -35,8 +35,6 @@ MainWindow::MainWindow(QWidget *parent) :
 	params.readParams("peers.json");
 	m_peer_lst = params.getPeerList();
 
-
-
 	for(auto it : m_peer_lst){
 		QString peer_val = QString::fromStdString(it.m_ipv6);
 		ui->peerListWidget->addItem(peer_val);
@@ -176,9 +174,9 @@ void MainWindow::startProgram(QStringList & l_peer_list)
 
 void MainWindow::onReciveTcp()
 {
-	std::string arr = m_socket->readAll().toStdString();
-
-	m_data_eater.eat(arr);
+    QByteArray data_array = m_socket->readAll();
+    std::string arr(data_array.data(), static_cast<size_t>(data_array.size()));
+    m_data_eater.eat(arr);
 	m_data_eater.process();
 	std::string last_cmd = m_data_eater.getLastCommand();
 	std::cout << "Last cmd: " << last_cmd << '\n';
@@ -216,7 +214,6 @@ bool MainWindow::check_connection() {
 void MainWindow::sendReciveTcp(QString &msg) {
 
 }
-
 
 void MainWindow::showDebugPage(QByteArray &pageCode) {
 

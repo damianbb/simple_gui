@@ -29,7 +29,7 @@ namespace Ui {
 class MainWindow;
 }
 
-class MainWindow final : public QMainWindow,commandExecutor
+class MainWindow : public QMainWindow,commandExecutor
 {
 	Q_OBJECT
 
