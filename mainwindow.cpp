@@ -241,20 +241,19 @@ void MainWindow::on_plusButton_clicked() {
 
 void MainWindow::on_minusButton_clicked()
 {
-	auto delete_list= ui->peerListWidget->selectedItems();
-	try{
-		qDebug()<<delete_list.at(0);
-		ui->peerListWidget->removeItemWidget(delete_list.at(0));
-		ui->peerListWidget->update();
-	} catch(...){
-		qDebug()<<"co mam niby usunac?!";
-	}
 
-/*	foreach (auto it,delete_list) {
-		ui->peerListWidget->removeItemWidget(it);
-//		qDebug()<<it->text();
-	}
-*/
+    const auto &delete_list= ui->peerListWidget->selectedItems();
+    try{
+        const auto &it = std::find_if_not(m_peer_lst.begin(), m_peer_lst.end()
+                                          , [&delete_list](const auto &a){return delete_list[0]->text().toStdString().find(a.m_ipv6) == std::string::npos;});
+        if(it != m_peer_lst.end())
+            m_peer_lst.erase(it);
+        ui->peerListWidget->removeItemWidget(delete_list.at(0));
+        delete_list.at(0)->setText("");
+        ui->peerListWidget->sortItems(Qt::DescendingOrder);
+    } catch(...){
+        qDebug()<<"co mam niby usunac?!";
+    }
 }
 
 void MainWindow::SavePeers(QString file_name)
