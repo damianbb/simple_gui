@@ -19,10 +19,6 @@ void netClient::startConnect(const QHostAddress &address, uint16_t port) {
 	if(!m_socket->waitForConnected(5000)) {
 		qDebug() << "Error: " << m_socket->errorString();
 	}
-/*	m_pr_call = true;
-	connect(this, SIGNAL(ask_for_peerlist()),this, SLOT(peerlist_request_slot()));
-
-	th_peerlist = std::make_unique<std::thread>([this]() { call_peerlist_requests(); });*/
 }
 
 bool netClient::is_connected() {

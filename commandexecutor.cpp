@@ -28,13 +28,22 @@ order::order(const std::string &json_str) {
 	using nlohmann::json;
 	json j = json::parse(json_str);
 	m_cmd = j["cmd"];
-	m_msg = j["msg"];
+	if (m_cmd == "peer_list") {
+		//m_msg_array = j["msg"];
+		std::vector<std::string> tmp = j["msg"];
+		m_msg_array = std::move(tmp);
+	} else {
+		m_msg = j["msg"];
+	}
 }
 
 order::order(order::e_type cmd) {
 	if (cmd == e_type::PING) {
 		m_cmd = "ping";
 		m_msg = "ping";
+	}
+	else if (cmd == e_type::PEER_LIST) {
+		m_cmd = "peer_list";
 	}
 }
 
@@ -44,7 +53,7 @@ std::string order::get_str() const {
 }
 
 std::string order::get_cmd() const {
-	return  m_cmd;
+	return m_cmd;
 }
 
 std::string order::get_msg() const {
@@ -62,5 +71,7 @@ commandExecutor::commandExecutor(std::shared_ptr<MainWindow> window)
 }
 
 void commandExecutor::timer_slot() {
+	order peer_list_order(order::e_type::PEER_LIST);
+	m_net_client->send_msg(peer_list_order.get_str());
 	qDebug() << "timer slot";
 }

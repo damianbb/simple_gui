@@ -6,6 +6,7 @@
 #include "json.hpp"
 #include <memory>
 #include <QTimer>
+#include <vector>
 
 class order final {
 public:
@@ -23,6 +24,7 @@ public:
 private:
 	std::string m_cmd;
 	std::string m_msg;
+	std::vector<std::string> m_msg_array;
 };
 
 class MainWindow;
