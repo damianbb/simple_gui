@@ -2,6 +2,8 @@
 #include <QProcess>
 #include <QTcpSocket>
 #include <QHostAddress>
+#include <QFileDialog>
+#include <QFormLayout>
 
 #include <regex>
 
@@ -11,6 +13,7 @@
 #include "paramscontainer.hpp"
 #include "dataeater.hpp"
 #include "debugdialog.hpp"
+#include "get_host_info.hpp"
 
 #include "trivialserialize.hpp"
 #include <boost/asio.hpp>
@@ -23,16 +26,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	/*
-	m_msg_server = new QTcpServer(this);
-	m_msg_server->setMaxPendingConnections(1);
-	m_msg_server->listen(QHostAddress::LocalHost,9933);
-	*/
 	ParamsContainer params;
 	params.readParams("peers.json");
 	m_peer_lst = params.getPeerList();
-
-
 
 	for(auto it : m_peer_lst){
 		QString peer_val = QString::fromStdString(it.m_ipv6);
@@ -71,30 +67,6 @@ MainWindow::~MainWindow()
 	delete m_dlg;
 }
 
-void MainWindow::on_connectButton_clicked()
-{
-	QStringList l_peer_list;
-
-	for (auto it :m_peer_lst) {
-		QString label = QString::fromStdString(it.m_ipv4+":"+std::to_string(it.m_port)+"-"+it.m_ipv6);
-		l_peer_list.push_back(label);
-	}
-	/*
-	for (int i= 0 ;i<ui->peerListWidget->count();i++) {
-		l_peer_list.push_back(ui->peerListWidget->item(i)->text());
-
-		//QString peer_string =" --peer "+my_ip +":9042-"+it;
-
-	}
-	*/
-	/*if (check_connection()) {
-		m_socket->disconnectFromHost();
-	}*/
-
-	startProgram(l_peer_list);
-	m_cmd_exec->startConnect(QHostAddress(QString("localhost")), 42000);
-}
-
 peer_reference peer_reference::get_validated_ref(std::string ref) {
 	std::string r_ipv4_port;
 	std::string r_ipv4;
@@ -131,7 +103,7 @@ peer_reference peer_reference::get_validated_ref(std::string ref) {
 	return {r_ipv4 ,stoi(r_port), r_ipv6};
 }
 
-void MainWindow::addAddress(QString address)
+void MainWindow::add_address(QString address)
 {
 	qDebug()<< "add address [" << address << ']';
 	try {
@@ -147,36 +119,28 @@ void MainWindow::addAddress(QString address)
 
 }
 
-void MainWindow::showDebugPage(QByteArray &pageCode)
-{
+
+void MainWindow::showDebugPage(QByteArray &pageCode) {
 
 }
 
-void MainWindow::startProgram(QStringList & l_peer_list)
-{
-	QString command = "./../../../galaxy42/tunserver.elf";
+void MainWindow::start_tunserver(std::vector<peer_reference> &peer_list, const QString &tunserver_path) {
+
 	QStringList params_list;
-	foreach (auto it, l_peer_list) {
-		QString peer_string =" --peer "+it;
-		params_list.push_back(peer_string);
+	for (const auto &peer : peer_list) {
+		std::string peer_string = " --peer ";
+		peer_string += peer.m_ipv4 + ":" + std::to_string(peer.m_port);
+		peer_string += "-" + peer.m_ipv6;
+		params_list.push_back(QString::fromStdString(peer_string));
 	}
 
 	qDebug()<<params_list;
 	QProcess *m_tunserver_process = new QProcess(this);
-	//connect (m_tunserver_process,SIGNAL(readyReadStandardOutput()),this,SLOT(onProcessInfo()));
-	//connect (m_tunserver_process,SIGNAL(readyReadStandardError()),this,SLOT(onProcessError()));
+	m_tunserver_process->start(tunserver_path , params_list);
 
-	m_tunserver_process->start(command , params_list);
+	if(m_tunserver_process->state() == QProcess::NotRunning)
+		throw std::runtime_error("Fail to run tunserver process");
 }
-
-
-void MainWindow::peerlist_request_slot() {
-/*	if (check_connection())
-		send_request( {
-						  {"cmd","peer_list"}
-					} );*/
-}
-
 
 void MainWindow::onProcessInfo() {
 
@@ -191,12 +155,11 @@ void MainWindow::onProcessError() {
 void MainWindow::on_plusButton_clicked() {
 
 	m_dlg = new addressDialog(this);
-	connect (m_dlg,SIGNAL(addAddress(QString)),this,SLOT(addAddress(QString)));
+	connect (m_dlg,SIGNAL(add_address(QString)),this,SLOT(add_address(QString)));
 	m_dlg->show();
 }
 
-void MainWindow::on_minusButton_clicked()
-{
+void MainWindow::on_minusButton_clicked() {
 	auto delete_list= ui->peerListWidget->selectedItems();
 	try{
 		qDebug()<<delete_list.at(0);
@@ -212,6 +175,59 @@ void MainWindow::on_minusButton_clicked()
 	}
 */
 }
+
+void MainWindow::on_run_tunserver_clicked() {
+	QStringList l_peer_list;
+
+	for (auto it :m_peer_lst) {
+		QString label = QString::fromStdString(it.m_ipv4+":"+std::to_string(it.m_port)+"-"+it.m_ipv6);
+		l_peer_list.push_back(label);
+	}
+
+
+	QString tunserver_location = QFileDialog::getOpenFileName(this,
+		tr("Open tunserver binary file (tunserver.elf)"));
+
+	try {
+		start_tunserver(m_peer_lst, tunserver_location);
+	} catch (const std::exception &err) {
+		qDebug() << err.what();
+	}
+}
+
+void MainWindow::add_host_info(QString host, uint16_t port) {
+
+	qDebug() << "Host: " << host << "Port:" << port << '\n';
+	if (host.isEmpty()) {
+		host = "localhost";
+		qDebug() << "use default 'localhost' host";
+	}
+	if (port == 0) {
+		port = 42000;
+		qDebug() << "use default '42000' port";
+	}
+	//m_cmd_exec->startConnect(QHostAddress(host), port);
+}
+
+void MainWindow::on_connectButton_clicked() {
+	hostDialog host_dialog;
+
+	connect (&host_dialog, SIGNAL(host_info(QString, uint16_t)),
+			 this, SLOT(add_host_info(QString, uint16_t)));
+
+	if (host_dialog.exec() == QDialog::Accepted){
+		qDebug() << "host inforation accepted";
+	}
+}
+
+void MainWindow::on_ping_clicked() {
+/*	if (check_connection())
+		send_request( {
+						{"cmd","ping"},
+						{"msg","ping"}
+					} );*/
+}
+
 
 void MainWindow::SavePeers(QString file_name)
 {
@@ -242,19 +258,9 @@ void MainWindow::show_peers(const nlohmann::json &msg) {
 	}
 }*/
 
-
-void MainWindow::on_actionDebug_triggered()
-{
-	qDebug()<< "show dlg";
+void MainWindow::on_actionDebug_triggered() {
+	qDebug()<< "show dialog";
 		DebugDialog dialog;
 		dialog.exec();
 		dialog.show();
-}
-
-void MainWindow::on_ping_clicked() {
-/*	if (check_connection())
-		send_request( {
-						{"cmd","ping"},
-						{"msg","ping"}
-					} );*/
 }
