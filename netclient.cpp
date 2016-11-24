@@ -6,7 +6,7 @@ netClient::netClient(std::shared_ptr<commandExecutor> cmd_exec_ptr)
 	m_cmd_exec(cmd_exec_ptr)
 {
 	m_socket = new QTcpSocket();
-	connect(m_socket, SIGNAL(readyRead()),this, SLOT(onTcpRecive()));
+	connect(m_socket, SIGNAL(readyRead()),this, SLOT(onTcpReceive()));
 }
 
 netClient::~netClient() {
@@ -46,6 +46,7 @@ void netClient::send_msg(const std::string &msg) {
 }
 
 void netClient::onTcpReceive() {
+	std::cout << "onTcpReceive\n";
 	QByteArray data_array = m_socket->readAll();
 	std::string arr(data_array.data(), static_cast<size_t>(data_array.size()));
 	m_data_eater.eat(arr);
