@@ -219,14 +219,14 @@ void MainWindow::add_host_info(QString host, uint16_t port) {
 
 	qDebug() << "Host: " << host << "Port:" << port << '\n';
 	if (host.isEmpty()) {
-		host = "localhost";
+		host = "127.0.0.1";
 		qDebug() << "use default 'localhost' host";
 	}
 	if (port == 0) {
 		port = 42000;
 		qDebug() << "use default '42000' port";
 	}
-	//m_cmd_exec->startConnect(QHostAddress(host), port);
+	m_cmd_exec->startConnect(QHostAddress(host), port);
 }
 
 void MainWindow::on_connectButton_clicked() {
