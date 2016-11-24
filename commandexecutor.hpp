@@ -8,7 +8,12 @@
 
 class order final {
 public:
-	order(nlohmann::json params);
+		enum class e_type {
+			PING,
+			PEER_LIST
+		};
+	//order(nlohmann::json params);
+	order(e_type cmd);
 	~order() = default;
 	std::string get_str() const;
 

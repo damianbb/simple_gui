@@ -25,6 +25,13 @@ void commandExecutor::startConnect(const QHostAddress &address, uint16_t port) {
 	m_net_client->startConnect(address, port);
 }
 
+order::order(order::e_type cmd) {
+	if (cmd == e_type::PING) {
+		m_cmd = "ping";
+		m_msg = "ping";
+	}
+}
+
 std::string order::get_str() const {
 	nlohmann::json j{{"cmd", m_cmd} , {"msg", m_msg}};
 	return j.dump();

@@ -241,11 +241,8 @@ void MainWindow::on_connectButton_clicked() {
 }
 
 void MainWindow::on_ping_clicked() {
-/*	if (check_connection())
-		send_request( {
-						{"cmd","ping"},
-						{"msg","ping"}
-					} );*/
+	order ord(order::e_type::PING);
+	m_cmd_exec->sendNetRequest(ord);
 }
 
 
