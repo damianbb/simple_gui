@@ -220,7 +220,7 @@ void MainWindow::add_host_info(QString host, uint16_t port) {
 	qDebug() << "Host: " << host << "Port:" << port << '\n';
 	if (host.isEmpty()) {
 		host = "127.0.0.1";
-		qDebug() << "use default 'localhost' host";
+		qDebug() << "use default 'localhost (127.0.0.1)' host";
 	}
 	if (port == 0) {
 		port = 42000;
