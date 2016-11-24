@@ -30,7 +30,8 @@ SOURCES += \
     debugdialog.cpp \
     trivialserialize.cpp \
     netclient.cpp \
-    commandexecutor.cpp
+    commandexecutor.cpp \
+    get_host_info.cpp
 
 HEADERS += \
     mainwindow.hpp \
@@ -44,12 +45,14 @@ HEADERS += \
     netmgr.hpp \
     debugdialog.hpp \
     trivialserialize.hpp \
-    netclient.hpp
+    netclient.hpp \
+    get_host_info.hpp
 
 FORMS += \
     mainwindow.ui \
     addressdialog.ui \
-    debugdialog.ui
+    debugdialog.ui \
+    get_host_info.ui
 
 
 debug {

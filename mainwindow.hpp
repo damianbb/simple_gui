@@ -41,7 +41,7 @@ public:
 	MainWindow (MainWindow &&other);
 	~MainWindow();
 
-	void startProgram(QStringList &l_params_list);
+	void start_tunserver(std::vector <peer_reference> &peer_list, const QString &tunserver_path);
 
 	void SavePeers(QString file_name);
 
@@ -49,7 +49,8 @@ public slots:
 	void onProcessInfo();
 	void onProcessError();
 
-	void addAddress(QString address);
+	void add_address(QString address);
+	void add_host_info(QString host, uint16_t port);
 	void showDebugPage(QByteArray &pageCode);
 
 
@@ -59,9 +60,10 @@ private slots:
 	void on_minusButton_clicked();
 	void on_actionDebug_triggered();
 
+	void on_connectButton_clicked();
 	void on_ping_clicked();
 
-	void peerlist_request_slot();
+	void on_run_tunserver_clicked();
 
 private:
 	std::shared_ptr<commandExecutor> m_cmd_exec;
