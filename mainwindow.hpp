@@ -12,7 +12,6 @@
 #include <atomic>
 #include <chrono>
 
-#include "netparser.hpp"
 #include "addressdialog.hpp"
 #include "dataeater.hpp"
 #include "commandexecutor.hpp"
