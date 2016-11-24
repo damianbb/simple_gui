@@ -27,8 +27,8 @@ class commandExecutor final : public std::enable_shared_from_this<commandExecuto
 		void sendNetRequest(const order &ord); ///< send order via network
 		void startConnect(const QHostAddress &address, uint16_t port);
 
-	private:
 		commandExecutor(std::shared_ptr<MainWindow> window);
+	private:
 		std::weak_ptr<MainWindow> m_main_window;
 		std::shared_ptr<netClient> m_net_client;
 };

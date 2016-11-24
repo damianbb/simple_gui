@@ -32,12 +32,12 @@ class MainWindow;
 
 class commandExecutor;
 
-class MainWindow final : public QMainWindow, std::enable_shared_from_this<MainWindow>
+class MainWindow final : public QMainWindow
 {
 	Q_OBJECT
 
 public:
-	static MainWindow create();
+	static std::shared_ptr<MainWindow> create_shared_ptr();
 	MainWindow (MainWindow &&other);
 	~MainWindow();
 
@@ -60,7 +60,6 @@ private slots:
 	void on_minusButton_clicked();
 	void on_actionDebug_triggered();
 
-	void on_connectButton_clicked();
 	void on_ping_clicked();
 
 	void on_run_tunserver_clicked();

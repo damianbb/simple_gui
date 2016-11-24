@@ -60,9 +60,10 @@ MainWindow::MainWindow(QWidget *parent) :
 */
 }
 
-MainWindow MainWindow::create() {
-	MainWindow ret;
-	ret.m_cmd_exec = commandExecutor::construct(ret.shared_from_this());
+std::shared_ptr<MainWindow> MainWindow::create_shared_ptr() {
+	// TODO
+	std::shared_ptr<MainWindow> ret(new MainWindow);// = std::make_shared<MainWindow>();
+	ret->m_cmd_exec = commandExecutor::construct(ret);
 	return ret;
 }
 

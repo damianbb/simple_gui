@@ -4,8 +4,8 @@
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
-	MainWindow w = MainWindow::create();
-	w.show();
+	std::shared_ptr<MainWindow> w = MainWindow::create_shared_ptr();
+	w->show();
 
 	return a.exec();
 }
