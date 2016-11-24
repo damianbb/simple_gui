@@ -8,6 +8,7 @@
 class commandExecutor;
 
 class netClient final : QObject {
+		Q_OBJECT
 	public:
 		netClient(std::shared_ptr<commandExecutor> cmd_exec_ptr);
 		~netClient();
