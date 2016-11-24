@@ -28,7 +28,7 @@ void dataeater::process() {
 
 uint16_t dataeater::pop_msg_size() {
 	uint16_t msg_size;
-	msg_size = m_internal_buffer.front() << 8;
+	msg_size = static_cast<uint16_t>(m_internal_buffer.front() << 8);
 	m_internal_buffer.pop();
 	msg_size += m_internal_buffer.front();
 	m_internal_buffer.pop();
@@ -74,11 +74,11 @@ bool dataeater::continiueProcessing() {
 }
 
 std::string dataeater::getLastCommand() {
-
-	if(m_commands_list.empty()) {
+	if(static_cast<size_t>(m_frame_size) != m_last_command.size()) {
 		return std::string();
 	}
-	return std::string (m_commands_list.back());
+	std::string ret = std::move(m_last_command);
+	return ret;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////

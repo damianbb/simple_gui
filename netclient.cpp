@@ -52,7 +52,7 @@ void netClient::onTcpReceive() {
 	m_data_eater.eat(arr);
 	m_data_eater.process();
 	std::string last_cmd = m_data_eater.getLastCommand();
-	std::cout << "last command " << last_cmd << "\n";
+	std::cout << "last command " << last_cmd << std::endl;
 	if (!last_cmd.empty()) {
 		auto cmd_exec_ptr = m_cmd_exec.lock();
 		cmd_exec_ptr->parseAndExecMsg(last_cmd);
