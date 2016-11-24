@@ -32,12 +32,13 @@ class MainWindow;
 
 class commandExecutor;
 
-class MainWindow final : public QMainWindow
+class MainWindow final : public QMainWindow, std::enable_shared_from_this<MainWindow>
 {
 	Q_OBJECT
 
 public:
-	explicit MainWindow(QWidget *parent = 0);
+	static MainWindow create();
+	MainWindow (MainWindow &&other);
 	~MainWindow();
 
 	void startProgram(QStringList &l_params_list);
@@ -69,6 +70,7 @@ private:
 	QProcess *m_tunserver_process;
 	addressDialog *m_dlg;
 	std::vector <peer_reference> m_peer_lst;
+	explicit MainWindow(QWidget *parent = nullptr);
 
 signals:
 	void ask_for_peerlist();

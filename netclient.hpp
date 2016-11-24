@@ -9,7 +9,7 @@ class commandExecutor;
 
 class netClient final : QObject {
 	public:
-		netClient();
+		netClient(std::shared_ptr<commandExecutor> cmd_exec_ptr);
 		~netClient();
 		void startConnect(const QHostAddress &address, uint16_t port);
 		bool is_connected();

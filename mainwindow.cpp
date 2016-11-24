@@ -64,6 +64,25 @@ MainWindow::MainWindow(QWidget *parent) :
 */
 }
 
+MainWindow MainWindow::create() {
+	MainWindow ret;
+	ret.m_cmd_exec = commandExecutor::construct(ret.shared_from_this());
+	return ret;
+}
+
+MainWindow::MainWindow(MainWindow &&other) {
+	if (this == &other)
+		return;
+	m_cmd_exec = std::move(other.m_cmd_exec);
+	ui = other.ui;
+	other.ui = nullptr;
+	m_tunserver_process = other.m_tunserver_process;
+	other.m_tunserver_process = nullptr;
+	m_dlg = other.m_dlg;
+	other.m_dlg = nullptr;
+	m_peer_lst = std::move(other.m_peer_lst);
+}
+
 MainWindow::~MainWindow()
 {
 	delete ui;

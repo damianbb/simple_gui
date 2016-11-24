@@ -20,14 +20,15 @@ private:
 class MainWindow;
 class netClient;
 
-class commandExecutor final {
+class commandExecutor final : public std::enable_shared_from_this<commandExecutor> {
 	public:
-		commandExecutor(const std::shared_ptr<MainWindow> &window);
+		static std::shared_ptr<commandExecutor> construct(std::shared_ptr<MainWindow> window);
 		void parseAndExecMsg(const std::string &msg); ///< parse network msg
 		void sendNetRequest(const order &ord); ///< send order via network
 		void startConnect(const QHostAddress &address, uint16_t port);
 
 	private:
+		commandExecutor(std::shared_ptr<MainWindow> window);
 		std::weak_ptr<MainWindow> m_main_window;
 		std::shared_ptr<netClient> m_net_client;
 };

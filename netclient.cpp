@@ -1,7 +1,9 @@
 #include "netclient.hpp"
 #include <cassert>
 
-netClient::netClient()
+netClient::netClient(std::shared_ptr<commandExecutor> cmd_exec_ptr)
+:
+	m_cmd_exec(cmd_exec_ptr)
 {
 	m_socket = new QTcpSocket();
 	connect(m_socket, SIGNAL(readyRead()),this, SLOT(onTcpRecive()));
