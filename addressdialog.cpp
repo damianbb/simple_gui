@@ -15,5 +15,5 @@ addressDialog::~addressDialog()
 
 void addressDialog::on_buttonBox_accepted()
 {
-	emit addAddress(ui->lineEdit->text());
+	emit add_address(ui->lineEdit->text());
 }

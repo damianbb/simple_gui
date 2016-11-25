@@ -142,7 +142,6 @@ void MainWindow::add_address(QString address)
 
 void MainWindow::showDebugPage(QByteArray &pageCode) {
 
-	m_tunserver_process->start(command , params_list);
 }
 
 void MainWindow::start_tunserver(std::vector<peer_reference> &peer_list, const QString &tunserver_path) {
@@ -181,14 +180,6 @@ void MainWindow::on_plusButton_clicked() {
 }
 
 void MainWindow::on_minusButton_clicked() {
-	auto delete_list= ui->peerListWidget->selectedItems();
-	try{
-		qDebug()<<delete_list.at(0);
-		ui->peerListWidget->removeItemWidget(delete_list.at(0));
-		ui->peerListWidget->update();
-	} catch(...){
-		qDebug()<<"co mam niby usunac?!";
-	}
 
     const auto &delete_list= ui->peerListWidget->selectedItems();
     try{

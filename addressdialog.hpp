@@ -16,7 +16,7 @@ public:
 	~addressDialog();
 
 signals:
-	void addAddress(QString);
+	void add_address(QString);
 
 private slots:
 	void on_buttonBox_accepted();
