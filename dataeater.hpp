@@ -12,6 +12,7 @@ public:
 
 	void eat(const std::vector<uint8_t> &data);
 	void eat(const std::string &data);
+	void eat(const char &ch);
 	void process();
 	bool hasNextCommand();
 	std::string getLastCommand();
