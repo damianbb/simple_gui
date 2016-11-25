@@ -35,6 +35,7 @@ bool netClient::is_connected() {
 }
 
 void netClient::send_msg(const std::string &msg) {
+	if (!is_connected()) return;
 	QByteArray packet = serialize_msg(msg);
 	size_t send_bytes = m_socket->write(packet);
 	if (send_bytes != packet.size())

@@ -20,6 +20,7 @@ public:
 	std::string get_str() const;
 	std::string get_cmd() const;
 	std::string get_msg() const;
+	std::vector<std::string> get_msg_array() const;
 
 private:
 	std::string m_cmd;

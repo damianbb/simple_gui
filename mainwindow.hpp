@@ -45,6 +45,7 @@ public:
 
 	void SavePeers(QString file_name);
 	void add_to_debug_window(const std::string &message);
+	void show_peers(const std::vector<std::string> &peers);
 
 public slots:
 	void onProcessInfo();

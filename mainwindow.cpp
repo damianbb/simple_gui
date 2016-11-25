@@ -258,6 +258,13 @@ void MainWindow::add_to_debug_window(const std::string &message) {
 	ui->debugWidget->scrollToBottom();
 }
 
+void MainWindow::show_peers(const std::vector<std::string> &peers) {
+	ui->peerListWidget->clear();
+	for (const auto &element : peers) {
+		ui->peerListWidget->addItem(QString(element.c_str()));
+	}
+}
+
 /*void MainWindow::show_msg(const json &msg)
 {
 	qDebug()<<"show new message \n";

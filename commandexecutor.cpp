@@ -10,11 +10,15 @@ std::shared_ptr<commandExecutor> commandExecutor::construct(std::shared_ptr<Main
 
 void commandExecutor::parseAndExecMsg(const std::string &msg) {
 	order input_order(msg);
-	std::cout << "execute cmd: " << input_order.get_cmd() << "\n";
+	const std::string cmd = input_order.get_cmd();
+	std::cout << "execute cmd: " << cmd << "\n";
 	auto main_window_ptr = m_main_window.lock();
 	main_window_ptr->add_to_debug_window("get message " + msg);
-	if (input_order.get_cmd() == "ping") {
+	if (cmd == "ping") {
 		// TODO show on main window
+	}
+	else if (cmd == "peer_list") {
+		main_window_ptr->show_peers(input_order.get_msg_array());
 	}
 }
 
@@ -60,6 +64,10 @@ std::string order::get_cmd() const {
 
 std::string order::get_msg() const {
 	return m_msg;
+}
+
+std::vector<std::string> order::get_msg_array() const {
+	return m_msg_array;
 }
 
 commandExecutor::commandExecutor(std::shared_ptr<MainWindow> window)
