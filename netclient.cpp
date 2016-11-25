@@ -9,9 +9,6 @@ netClient::netClient(std::shared_ptr<commandExecutor> cmd_exec_ptr)
 	connect(m_socket.get(), SIGNAL(readyRead()),this, SLOT(onTcpReceive()));
 }
 
-netClient::~netClient() {
-}
-
 void netClient::startConnect(const QHostAddress &address, uint16_t port) {
 	m_socket->connectToHost(address, port);
 	// we need to wait...
