@@ -23,30 +23,32 @@ SOURCES += \
     mainwindow.cpp \
     addressdialog.cpp \
     paramscontainer.cpp \
-    netparser.cpp \
     commandparser.cpp \
     dataeater.cpp \
-    netmgr.cpp \
     debugdialog.cpp \
-    trivialserialize.cpp
+    trivialserialize.cpp \
+    netclient.cpp \
+    commandexecutor.cpp \
+    get_host_info.cpp
 
 HEADERS += \
     mainwindow.hpp \
     addressdialog.hpp \
     paramscontainer.hpp \
-    netparser.hpp \
     commandparser.hpp \
     dataeater.hpp \
     commandexecutor.hpp \
     json.hpp \
-    netmgr.hpp \
     debugdialog.hpp \
-    trivialserialize.hpp
+    trivialserialize.hpp \
+    netclient.hpp \
+    get_host_info.hpp
 
 FORMS += \
     mainwindow.ui \
     addressdialog.ui \
-    debugdialog.ui
+    debugdialog.ui \
+    get_host_info.ui
 
 
 debug {
@@ -55,4 +57,22 @@ debug {
 
 release {
 	DESTDIR = build/release
+}
+
+
+test {
+    message(Test build)
+
+    QT += testlib
+    TARGET = test_simpleGui
+    SOURCES -= main.cpp
+
+    HEADERS += \
+        qtest/t_dataeater.hpp
+
+    SOURCES += \
+        qtest/main.cpp \
+
+} else {
+    message(Normal build)
 }

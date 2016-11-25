@@ -4,13 +4,15 @@
 
 #include <memory>
 #include <queue>
+#include <QByteArray>
 
 class dataeater {
 public:
 	dataeater(): m_is_processing(false){;}
 
-	void eat(std::vector<uint8_t> &data);
-	void eat(std::string &data);
+	void eat(const std::vector<uint8_t> &data);
+	void eat(const std::string &data);
+	void eat(const char &ch);
 	void process();
 	bool hasNextCommand();
 	std::string getLastCommand();
@@ -30,19 +32,5 @@ private:
 	int m_current_index;
 };
 
-// using trivialserialize
-class simple_packet_eater {
-public:
-	static std::string process_packet(const std::string &pck);
-
-	static std::vector<uint8_t> serialize_msg(const std::string &msg);
-	static std::string deserialize_msg(const std::vector<uint8_t> &packet);
-
-	void eat_packet(const std::string &pck);
-	std::string pop_last_message();
-
-private:
-	std::queue<std::string> m_msg_queue;
-};
 
 #endif // DATAEATER_H

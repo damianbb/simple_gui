@@ -4,17 +4,22 @@
 
 #include "trivialserialize.hpp"
 
-void dataeater::eat(std::vector<uint8_t> &data) {
+void dataeater::eat(const std::vector<uint8_t> &data) {
 	for(const auto &i:data) m_internal_buffer.push(i);
 }
 
-void dataeater::eat(std::string &data) {
+void dataeater::eat(const std::string &data) {
 	static_assert(sizeof(char) == sizeof(uint8_t), "size of char are different than size of uint8_t");
 	for(const auto i:data) {
-		uint8_t que_ele;
-		memcpy(&que_ele,&i,sizeof(uint8_t));
-		m_internal_buffer.push(que_ele);
+		eat(i);
 	}
+}
+
+void dataeater::eat(const char &ch) {
+	static_assert(sizeof(char) == sizeof(uint8_t), "size of char are different than size of uint8_t");
+	uint8_t que_ele;
+	memcpy(&que_ele,&ch,sizeof(uint8_t));
+	m_internal_buffer.push(que_ele);
 }
 
 void dataeater::process() {
@@ -28,7 +33,7 @@ void dataeater::process() {
 
 uint16_t dataeater::pop_msg_size() {
 	uint16_t msg_size;
-	msg_size = m_internal_buffer.front() << 8;
+	msg_size = static_cast<uint16_t>(m_internal_buffer.front() << 8);
 	m_internal_buffer.pop();
 	msg_size += m_internal_buffer.front();
 	m_internal_buffer.pop();
@@ -58,14 +63,15 @@ bool dataeater::processFresh() {
 
 bool dataeater::continiueProcessing() {
 
-	while (!m_internal_buffer.empty()) {
+	while (true) {
 		if (m_frame_size == m_current_index) {
 			m_commands_list.push(m_last_command);
 			m_last_command.clear();
 			m_is_processing= false;
 			processFresh();
 			return true;
-		}else {
+		} else {
+			if(m_internal_buffer.empty()) break;
 			m_last_command.push_back(m_internal_buffer.front()); m_internal_buffer.pop();
 		}
 		m_current_index++;
@@ -74,7 +80,6 @@ bool dataeater::continiueProcessing() {
 }
 
 std::string dataeater::getLastCommand() {
-
 	if(m_commands_list.empty()) {
 		return std::string();
 	}
@@ -82,53 +87,3 @@ std::string dataeater::getLastCommand() {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-
-std::vector<uint8_t> simple_packet_eater::serialize_msg(const std::string &msg) {
-	assert(msg.size() <= std::numeric_limits<uint16_t>::max() && "Too big message");
-	uint16_t msg_size = msg.size();
-
-	std::vector<uint8_t> packet(msg_size+2); // 2 is bytes for size
-
-	packet[0] = msg_size >> 8;
-	packet[1] = msg_size & 0xFF;
-
-	for (int i = 0; i < msg_size; ++i) {
-		packet.at(i + 2) = msg.at(i);
-	}
-	return packet;
-}
-
-std::string simple_packet_eater::deserialize_msg(const std::vector<uint8_t> &packet) {
-	uint16_t msg_size;
-	msg_size = packet[0] << 8;
-	msg_size += packet[1];
-	std::string msg(msg_size, 0);
-	for (size_t i = 0; i < msg_size; ++i) {
-		msg.at(i) = packet.at(i + 2);
-	}
-	return msg;
-}
-
-std::string simple_packet_eater::process_packet(const std::string &pck) {
-
-	trivialserialize::parser parser(trivialserialize::parser::tag_caller_must_keep_this_string_valid(),
-									pck);
-	uint64_t msg_size = parser.pop_integer_uvarint();
-	parser.pop_bytes_n(1);
-	std::cout << "Parsed msg size: " << msg_size << '\n';
-	return parser.pop_bytes_n(msg_size);
-}
-
-void simple_packet_eater::eat_packet(const std::string &pck) {
-	m_msg_queue.push(simple_packet_eater::process_packet(pck));
-}
-
-std::string simple_packet_eater::pop_last_message() {
-	if(m_msg_queue.empty()) {
-		return "";
-	}
-	std::string msg = m_msg_queue.front();
-	m_msg_queue.pop();
-	std::cout << "msg=[" << msg << "] size=[" << msg.size() << "]\n";
-	return msg;
-}

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>548</width>
-    <height>400</height>
+    <width>577</width>
+    <height>446</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>lista peerow</string>
+         <string>Peer List</string>
         </property>
        </widget>
       </item>
@@ -45,6 +45,19 @@
            </spacer>
           </item>
           <item>
+           <widget class="QLabel" name="peer_manage">
+            <property name="text">
+             <string>Add/Del Peers</string>
+            </property>
+            <property name="textFormat">
+             <enum>Qt::AutoText</enum>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
            <layout class="QVBoxLayout" name="verticalLayout">
             <item>
              <widget class="QPushButton" name="plusButton">
@@ -61,6 +74,59 @@
              </widget>
             </item>
            </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Maximum</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>5</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="run_tunserver">
+            <property name="text">
+             <string>Run Tunserver</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Maximum</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>50</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="connectButton">
+            <property name="text">
+             <string>Connect To</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="ping">
+            <property name="text">
+             <string>Ping</string>
+            </property>
+           </widget>
           </item>
           <item>
            <spacer name="verticalSpacer_2">
@@ -80,21 +146,34 @@
        </layout>
       </item>
       <item>
-       <widget class="QPushButton" name="connectButton">
+       <spacer name="verticalSpacer_5">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Maximum</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>10</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Connect</string>
+         <string>Runtime Info</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="ping">
-        <property name="text">
-         <string>Ping</string>
+       <widget class="QListWidget" name="debugWidget">
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAsNeeded</enum>
         </property>
        </widget>
-      </item>
-      <item>
-       <widget class="QListWidget" name="debugWidget"/>
       </item>
      </layout>
     </item>
@@ -105,13 +184,13 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>548</width>
-     <height>19</height>
+     <width>577</width>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_Plik">
     <property name="title">
-     <string>&amp;Plik</string>
+     <string>P&amp;lik</string>
     </property>
     <addaction name="actionDebug"/>
    </widget>
