@@ -1,6 +1,7 @@
 #ifndef NETCLIENT_HPP
 #define NETCLIENT_HPP
 
+#include <memory>
 #include <QTcpSocket>
 #include "dataeater.hpp"
 #include "commandexecutor.hpp"
@@ -17,7 +18,7 @@ class netClient final : QObject {
 		void send_msg(const std::string &msg);
 	private:
 		std::weak_ptr<commandExecutor> m_cmd_exec;
-		QTcpSocket *m_socket;
+		std::unique_ptr<QTcpSocket> m_socket;
 		dataeater m_data_eater;
 		QByteArray serialize_msg(const std::string &msg);
 

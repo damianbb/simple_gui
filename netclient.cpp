@@ -3,14 +3,13 @@
 
 netClient::netClient(std::shared_ptr<commandExecutor> cmd_exec_ptr)
 :
-	m_cmd_exec(cmd_exec_ptr)
+	m_cmd_exec(cmd_exec_ptr),
+	m_socket(std::make_unique<QTcpSocket>())
 {
-	m_socket = new QTcpSocket();
-	connect(m_socket, SIGNAL(readyRead()),this, SLOT(onTcpReceive()));
+	connect(m_socket.get(), SIGNAL(readyRead()),this, SLOT(onTcpReceive()));
 }
 
 netClient::~netClient() {
-	delete m_socket;
 }
 
 void netClient::startConnect(const QHostAddress &address, uint16_t port) {
