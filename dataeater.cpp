@@ -63,14 +63,15 @@ bool dataeater::processFresh() {
 
 bool dataeater::continiueProcessing() {
 
-	while (!m_internal_buffer.empty()) {
+	while (true) {
 		if (m_frame_size == m_current_index) {
 			m_commands_list.push(m_last_command);
 			m_last_command.clear();
 			m_is_processing= false;
 			processFresh();
 			return true;
-		}else {
+		} else {
+			if(m_internal_buffer.empty()) break;
 			m_last_command.push_back(m_internal_buffer.front()); m_internal_buffer.pop();
 		}
 		m_current_index++;
@@ -79,11 +80,10 @@ bool dataeater::continiueProcessing() {
 }
 
 std::string dataeater::getLastCommand() {
-	if(static_cast<size_t>(m_frame_size) != m_last_command.size()) {
+	if(m_commands_list.empty()) {
 		return std::string();
 	}
-	std::string ret = std::move(m_last_command);
-	return ret;
+	return std::string (m_commands_list.back());
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
