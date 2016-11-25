@@ -10,8 +10,8 @@ class dataeater {
 public:
 	dataeater(): m_is_processing(false){;}
 
-	void eat(std::vector<uint8_t> &data);
-	void eat(std::string &data);
+	void eat(const std::vector<uint8_t> &data);
+	void eat(const std::string &data);
 	void process();
 	bool hasNextCommand();
 	std::string getLastCommand();

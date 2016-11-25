@@ -4,11 +4,11 @@
 
 #include "trivialserialize.hpp"
 
-void dataeater::eat(std::vector<uint8_t> &data) {
+void dataeater::eat(const std::vector<uint8_t> &data) {
 	for(const auto &i:data) m_internal_buffer.push(i);
 }
 
-void dataeater::eat(std::string &data) {
+void dataeater::eat(const std::string &data) {
 	static_assert(sizeof(char) == sizeof(uint8_t), "size of char are different than size of uint8_t");
 	for(const auto i:data) {
 		uint8_t que_ele;
