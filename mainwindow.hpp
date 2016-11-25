@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QListWidget>
 #include <QProcess>
 #include <QTcpSocket>
 #include <QVector>
@@ -35,7 +36,6 @@ class commandExecutor;
 class MainWindow final : public QMainWindow
 {
 	Q_OBJECT
-
 public:
 	static std::shared_ptr<MainWindow> create_shared_ptr();
 	MainWindow (MainWindow &&other);
@@ -44,6 +44,7 @@ public:
 	void start_tunserver(std::vector <peer_reference> &peer_list, const QString &tunserver_path);
 
 	void SavePeers(QString file_name);
+	void add_to_debug_window(const std::string &message);
 
 public slots:
 	void onProcessInfo();

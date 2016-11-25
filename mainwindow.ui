@@ -169,7 +169,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QListWidget" name="debugWidget"/>
+       <widget class="QListWidget" name="debugWidget">
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAsNeeded</enum>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -181,7 +185,7 @@
      <x>0</x>
      <y>0</y>
      <width>577</width>
-     <height>19</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_Plik">

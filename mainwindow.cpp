@@ -253,6 +253,11 @@ void MainWindow::SavePeers(QString file_name)
 	container.writeParams(file_name);
 }
 
+void MainWindow::add_to_debug_window(const std::string &message) {
+	ui->debugWidget->addItem(message.c_str());
+	ui->debugWidget->scrollToBottom();
+}
+
 /*void MainWindow::show_msg(const json &msg)
 {
 	qDebug()<<"show new message \n";
